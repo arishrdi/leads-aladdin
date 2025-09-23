@@ -3,6 +3,7 @@ import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { MobileNav } from '@/components/mobile-nav';
+import { Toaster } from '@/components/ui/toaster';
 import { type BreadcrumbItem, type User } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -20,6 +21,7 @@ export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWi
                 </div>
             </AppContent>
             <MobileNav user={auth.user} />
+            <Toaster />
         </AppShell>
     );
 }

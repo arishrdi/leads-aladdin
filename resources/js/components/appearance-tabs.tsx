@@ -1,12 +1,35 @@
-import { Appearance, useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
 import { LucideIcon, Monitor, Moon, Sun } from 'lucide-react';
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useEffect, useState } from 'react';
+
+type Theme = 'light' | 'dark' | 'system';
 
 export default function AppearanceToggleTab({ className = '', ...props }: HTMLAttributes<HTMLDivElement>) {
-    const { appearance, updateAppearance } = useAppearance();
+    const [theme, setTheme] = useState<Theme>('system');
 
-    const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
+    useEffect(() => {
+        const stored = localStorage.getItem('theme') as Theme | null;
+        if (stored) {
+            setTheme(stored);
+        }
+    }, []);
+
+    const updateTheme = (newTheme: Theme) => {
+        setTheme(newTheme);
+        
+        const root = window.document.documentElement;
+        
+        if (newTheme === 'system') {
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            root.classList.toggle('dark', systemTheme === 'dark');
+        } else {
+            root.classList.toggle('dark', newTheme === 'dark');
+        }
+        
+        localStorage.setItem('theme', newTheme);
+    };
+
+    const tabs: { value: Theme; icon: LucideIcon; label: string }[] = [
         { value: 'light', icon: Sun, label: 'Terang' },
         { value: 'dark', icon: Moon, label: 'Gelap' },
         { value: 'system', icon: Monitor, label: 'Sistem' },
@@ -17,10 +40,10 @@ export default function AppearanceToggleTab({ className = '', ...props }: HTMLAt
             {tabs.map(({ value, icon: Icon, label }) => (
                 <button
                     key={value}
-                    onClick={() => updateAppearance(value)}
+                    onClick={() => updateTheme(value)}
                     className={cn(
                         'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
-                        appearance === value
+                        theme === value
                             ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
                             : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
                     )}

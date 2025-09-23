@@ -84,12 +84,12 @@ export default function FollowUpsIndex() {
     });
 
     const statusColors = {
-        WARM: 'bg-blue-100 text-blue-800',
-        HOT: 'bg-orange-100 text-orange-800',
-        CUSTOMER: 'bg-green-100 text-green-800',
-        EXIT: 'bg-red-100 text-red-800',
-        COLD: 'bg-gray-100 text-gray-800',
-        CROSS_SELLING: 'bg-purple-100 text-purple-800',
+        WARM: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700',
+        HOT: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-700',
+        CUSTOMER: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700',
+        EXIT: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700',
+        COLD: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+        CROSS_SELLING: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700',
     };
 
     const formatTime = (dateString: string) => {
@@ -160,41 +160,54 @@ export default function FollowUpsIndex() {
     const hasDateFilter = filters.start_date || filters.end_date;
 
     // Component for rendering follow-up items
-    const FollowUpItem = ({ followUp, showFullDate = false, buttonText = "Mulai Follow-up", buttonColor = "bg-[#2B5235] hover:bg-[#2B5235]/90", showCompletedTime = false }: { 
+    const FollowUpItem = ({ followUp, showFullDate = false, buttonText = "Mulai Follow-up", buttonColor = "bg-brand-primary hover:bg-brand-primary-dark", showCompletedTime = false }: { 
         followUp: FollowUp; 
         showFullDate?: boolean; 
         buttonText?: string;
         buttonColor?: string;
         showCompletedTime?: boolean;
     }) => (
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold text-[#2B5235]">
-                        {followUp.leads.nama_pelanggan}
-                    </h3>
-                    <Badge className={statusColors[followUp.leads.status as keyof typeof statusColors]}>
-                        {followUp.leads.status}
-                    </Badge>
-                    {showFullDate && followUp.status && (
-                        <Badge variant={followUp.status === 'completed' ? 'default' : 'secondary'}>
-                            {followUp.status === 'completed' ? 'Selesai' : 'Dijadwalkan'}
-                        </Badge>
-                    )}
-                    {followUp.auto_scheduled && (
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                            Auto-scheduled
-                        </Badge>
-                    )}
-                </div>
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{config.followUpStages[followUp.stage] || followUp.stage} - Percobaan #{followUp.attempt}</span>
+        <div className="p-4 rounded-lg bg-card border border-border/50 shadow-soft hover:shadow-soft-md transition-all duration-200">
+            <div className="space-y-4">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="space-y-2 flex-1">
+                        <h3 className="font-semibold text-lg text-brand-primary">
+                            {followUp.leads.nama_pelanggan}
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                            <Badge className={statusColors[followUp.leads.status as keyof typeof statusColors]} variant="outline">
+                                {followUp.leads.status}
+                            </Badge>
+                            {showFullDate && followUp.status && (
+                                <Badge variant={followUp.status === 'completed' ? 'default' : 'secondary'}>
+                                    {followUp.status === 'completed' ? 'Selesai' : 'Dijadwalkan'}
+                                </Badge>
+                            )}
+                            {followUp.auto_scheduled && (
+                                <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700">
+                                    Auto-scheduled
+                                </Badge>
+                            )}
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="h-4 w-4" />
-                        <span className={`font-medium ${showFullDate ? 'text-[#2B5235]' : buttonColor.includes('red') ? 'text-red-600' : 'text-[#2B5235]'}`}>
+                </div>
+                {/* Details */}
+                <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                        <div className="p-1 rounded bg-brand-primary/10">
+                            <Clock className="h-4 w-4 text-brand-primary" />
+                        </div>
+                        <span className="font-medium text-brand-primary">
+                            {config.followUpStages[followUp.stage] || followUp.stage} - Percobaan #{followUp.attempt}
+                        </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm">
+                        <div className="p-1 rounded bg-muted/50">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <span className={`font-medium ${buttonColor.includes('red') ? 'text-destructive' : 'text-brand-primary'}`}>
                             {showCompletedTime && followUp.completed_at 
                                 ? `Selesai: ${formatTime(followUp.completed_at)}`
                                 : showFullDate 
@@ -203,64 +216,81 @@ export default function FollowUpsIndex() {
                             }
                         </span>
                     </div>
-                    {/* Excel-like checkbox progress */}
+
+                    {/* Progress tracking */}
                     <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-500">Progress:</span>
+                        <span className="text-muted-foreground font-medium">Progress:</span>
                         <div className="flex items-center gap-1">
                             {followUp.attempt_1_completed ? (
-                                <CheckCircle className="w-4 h-4 text-green-600" title={`Attempt 1: ${followUp.attempt_1_completed_at ? new Date(followUp.attempt_1_completed_at).toLocaleDateString('id-ID') : 'Completed'}`} />
+                                <CheckCircle className="w-5 h-5 text-success" title={`Attempt 1: ${followUp.attempt_1_completed_at ? new Date(followUp.attempt_1_completed_at).toLocaleDateString('id-ID') : 'Completed'}`} />
                             ) : (
-                                <Circle className="w-4 h-4 text-gray-400" title="Attempt 1: Not completed" />
+                                <Circle className="w-5 h-5 text-muted-foreground/50" title="Attempt 1: Not completed" />
                             )}
                             {followUp.attempt_2_completed ? (
-                                <CheckCircle className="w-4 h-4 text-green-600" title={`Attempt 2: ${followUp.attempt_2_completed_at ? new Date(followUp.attempt_2_completed_at).toLocaleDateString('id-ID') : 'Completed'}`} />
+                                <CheckCircle className="w-5 h-5 text-success" title={`Attempt 2: ${followUp.attempt_2_completed_at ? new Date(followUp.attempt_2_completed_at).toLocaleDateString('id-ID') : 'Completed'}`} />
                             ) : (
-                                <Circle className="w-4 h-4 text-gray-400" title="Attempt 2: Not completed" />
+                                <Circle className="w-5 h-5 text-muted-foreground/50" title="Attempt 2: Not completed" />
                             )}
                             {followUp.attempt_3_completed ? (
-                                <CheckCircle className="w-4 h-4 text-green-600" title={`Attempt 3: ${followUp.attempt_3_completed_at ? new Date(followUp.attempt_3_completed_at).toLocaleDateString('id-ID') : 'Completed'}`} />
+                                <CheckCircle className="w-5 h-5 text-success" title={`Attempt 3: ${followUp.attempt_3_completed_at ? new Date(followUp.attempt_3_completed_at).toLocaleDateString('id-ID') : 'Completed'}`} />
                             ) : (
-                                <Circle className="w-4 h-4 text-gray-400" title="Attempt 3: Not completed" />
+                                <Circle className="w-5 h-5 text-muted-foreground/50" title="Attempt 3: Not completed" />
                             )}
-                            <span className="text-xs text-gray-500 ml-1">
+                            <span className="text-xs text-muted-foreground ml-2 font-medium">
                                 ({followUp.completed_attempts_count}/3)
                             </span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Phone className="h-4 w-4" />
+
+                    {/* Contact info */}
+                    <div className="flex items-center gap-2 text-sm">
+                        <div className="p-1 rounded bg-green-50 dark:bg-green-950">
+                            <Phone className="h-4 w-4 text-success" />
+                        </div>
                         <a 
                             href={`tel:${followUp.leads.no_whatsapp}`}
-                            className="text-[#2B5235] hover:underline"
+                            className="text-brand-primary hover:text-brand-primary-dark transition-colors font-medium"
                         >
                             {formatPhoneNumber(followUp.leads.no_whatsapp)}
                         </a>
                     </div>
+
                     {followUp.leads.nama_masjid_instansi && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <User className="h-4 w-4" />
-                            <span>{followUp.leads.nama_masjid_instansi}</span>
+                        <div className="flex items-center gap-2 text-sm">
+                            <div className="p-1 rounded bg-muted/50">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <span className="text-muted-foreground">{followUp.leads.nama_masjid_instansi}</span>
                         </div>
                     )}
+
                     {showFullDate && followUp.hasil_followup && (
-                        <div>
-                            <p className="text-xs text-gray-500 mb-1">Hasil:</p>
-                            <p className="text-sm bg-gray-50 p-2 rounded">{followUp.hasil_followup}</p>
+                        <div className="mt-4 p-3 bg-muted/30 rounded-lg">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Hasil Follow-up:</p>
+                            <p className="text-sm text-foreground">{followUp.hasil_followup}</p>
                         </div>
                     )}
                 </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-                <a href={`https://wa.me/${followUp.leads.no_whatsapp}`} target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" variant="outline" className="w-full sm:w-auto">
-                        WhatsApp
-                    </Button>
-                </a>
-                <Link href={`/follow-ups/${followUp.id}`}>
-                    <Button size="sm" className={`w-full sm:w-auto ${buttonColor}`}>
-                        {buttonText}
-                    </Button>
-                </Link>
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border/50">
+                    <a 
+                        href={`https://wa.me/${followUp.leads.no_whatsapp}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex-1"
+                    >
+                        <Button variant="outline" className="w-full touch-target">
+                            <Phone className="h-4 w-4 mr-2" />
+                            WhatsApp
+                        </Button>
+                    </a>
+                    <Link href={`/follow-ups/${followUp.id}`} className="flex-1">
+                        <Button className={`w-full touch-target ${buttonColor} transition-colors`}>
+                            {buttonText}
+                        </Button>
+                    </Link>
+                </div>
             </div>
         </div>
     );
@@ -271,13 +301,13 @@ export default function FollowUpsIndex() {
             
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Follow-up Management</h1>
-                        <p className="text-gray-600">Kelola jadwal follow-up dan pantau progres leads Anda</p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="space-y-2">
+                        <h1 className="text-brand-primary">Follow-up Management</h1>
+                        <p className="text-muted-foreground text-lg">Kelola jadwal follow-up dan pantau progres leads Anda</p>
                     </div>
                     <Link href="/follow-ups/excel-view">
-                        <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
+                        <Button className="bg-brand-primary hover:bg-brand-primary-dark transition-colors touch-target">
                             <FileSpreadsheet className="h-4 w-4 mr-2" />
                             Excel View
                         </Button>
@@ -324,45 +354,56 @@ export default function FollowUpsIndex() {
                 </Card>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Follow-up</CardTitle>
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card className="border-border/50 shadow-soft hover:shadow-soft-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Follow-up</CardTitle>
+                            <div className="p-2 rounded-lg bg-muted/50">
+                                <Calendar className="h-5 w-5 text-brand-primary" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{statistics.total}</div>
-                            <p className="text-xs text-muted-foreground">Bulan ini</p>
+                            <div className="text-3xl font-bold text-brand-primary">{statistics.total}</div>
+                            <p className="text-xs text-muted-foreground mt-1">Periode ini</p>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Selesai</CardTitle>
-                            <CheckCircle className="h-4 w-4 text-green-600" />
+                    <Card className="border-border/50 shadow-soft hover:shadow-soft-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Selesai</CardTitle>
+                            <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950">
+                                <CheckCircle className="h-5 w-5 text-success" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-green-600">{statistics.completed}</div>
+                            <div className="text-3xl font-bold text-success">{statistics.completed}</div>
+                            <p className="text-xs text-muted-foreground mt-1">Follow-up berhasil</p>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Tidak Respon</CardTitle>
-                            <XCircle className="h-4 w-4 text-red-600" />
+                    <Card className="border-border/50 shadow-soft hover:shadow-soft-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Tidak Respon</CardTitle>
+                            <div className="p-2 rounded-lg bg-red-50 dark:bg-red-950">
+                                <XCircle className="h-5 w-5 text-destructive" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-red-600">{statistics.no_response}</div>
+                            <div className="text-3xl font-bold text-destructive">{statistics.no_response}</div>
+                            <p className="text-xs text-muted-foreground mt-1">Perlu tindak lanjut</p>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
-                            <TrendingUp className="h-4 w-4 text-[#2B5235]" />
+                    <Card className="border-border/50 shadow-soft hover:shadow-soft-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Response Rate</CardTitle>
+                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950">
+                                <TrendingUp className="h-5 w-5 text-info" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-[#2B5235]">{statistics.response_rate}%</div>
+                            <div className="text-3xl font-bold text-info">{statistics.response_rate}%</div>
+                            <p className="text-xs text-muted-foreground mt-1">Tingkat respons</p>
                         </CardContent>
                     </Card>
                 </div>

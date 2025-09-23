@@ -3,7 +3,6 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { BranchSelector } from '@/components/branch-selector';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import { type NavItem, type User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutGrid, Users, Building, Calendar, FileText, Settings, BarChart3, Phone, UserCog, Database, FolderOpen } from 'lucide-react';
@@ -100,11 +99,11 @@ export function AppSidebar() {
     const mainNavItems = getMainNavItems(auth.user);
 
     return (
-        <Sidebar collapsible="icon" variant="inset" className="border-r border-[#DDBE75]/20">
-            <SidebarHeader>
+        <Sidebar collapsible="icon" variant="inset" className="border-r border-brand-secondary/20 shadow-soft-md">
+            <SidebarHeader className="border-b border-border/50">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="hover:bg-muted/50 transition-colors">
                             <Link href="/dashboard" prefetch>
                                 <AppLogo />
                             </Link>
@@ -113,13 +112,13 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
-                <BranchSelector className="mb-4" />
+            <SidebarContent className="py-4">
+                <BranchSelector className="mb-6 px-2" />
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+            <SidebarFooter className="border-t border-border/50 mt-auto">
+                <NavFooter items={footerNavItems} />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

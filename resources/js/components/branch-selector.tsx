@@ -63,22 +63,32 @@ export function BranchSelector({ className = '' }: BranchSelectorProps) {
     }
 
     return (
-        <div className={`px-2 ${className}`}>
-            <div className="flex items-center gap-2 mb-2">
-                <Building className="h-4 w-4 text-[#2B5235]" />
-                <span className="text-sm font-medium text-[#2B5235]">Cabang Aktif</span>
+        <div className={className}>
+            <div className="flex items-center gap-2 mb-3">
+                <div className="p-1 rounded bg-brand-primary/10">
+                    <Building className="h-4 w-4 text-brand-primary" />
+                </div>
+                <span className="text-sm font-medium text-brand-primary">Cabang Aktif</span>
             </div>
             <Select value={selectedBranch} onValueChange={handleBranchChange}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full touch-target border-brand-primary/20 hover:border-brand-primary/40 transition-colors">
                     <SelectValue placeholder="Pilih cabang" />
                 </SelectTrigger>
                 <SelectContent>
                     {auth.user.role === 'super_user' && (
-                        <SelectItem value="all">Semua Cabang</SelectItem>
+                        <SelectItem value="all" className="font-medium">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-brand-primary"></div>
+                                Semua Cabang
+                            </div>
+                        </SelectItem>
                     )}
                     {branches.map((branch) => (
                         <SelectItem key={branch.id} value={branch.id.toString()}>
-                            {branch.nama_cabang}
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-brand-secondary"></div>
+                                {branch.nama_cabang}
+                            </div>
                         </SelectItem>
                     ))}
                 </SelectContent>

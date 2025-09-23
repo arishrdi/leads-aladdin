@@ -7,8 +7,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel className="text-[#2B5235] font-medium">Leads Aladdin</SidebarGroupLabel>
-            <SidebarMenu>
+            <SidebarGroupLabel className="text-brand-primary font-semibold mb-2">Menu Utama</SidebarGroupLabel>
+            <SidebarMenu className="space-y-1">
                 {items.map((item) => {
                     const isActive = page.url === item.href || 
                                    (item.href !== '/dashboard' && page.url.startsWith(item.href));
@@ -19,10 +19,10 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 asChild
                                 isActive={isActive}
                                 tooltip={{ children: item.title }}
-                                className="text-sm font-medium hover:bg-[#2B5235]/10 data-[active=true]:bg-[#2B5235] data-[active=true]:text-white"
+                                className="text-sm font-medium transition-all duration-200 touch-target"
                             >
-                                <Link href={item.href} prefetch>
-                                    {item.icon && <item.icon className="h-4 w-4" />}
+                                <Link href={item.href} prefetch >
+                                    {item.icon && <item.icon className="h-5 w-5" />}
                                     <span>{item.title}</span>
                                 </Link>
                             </SidebarMenuButton>

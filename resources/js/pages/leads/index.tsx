@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Plus, Search, Eye, Edit, Phone } from 'lucide-react';
+import { Plus, Search, Eye, Edit, Phone, Users } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -69,19 +69,21 @@ export default function LeadsIndex() {
     const [cabangId, setCabangId] = useState(filters.cabang_id || 'all');
 
     const statusColors = {
-        NEW: 'bg-gray-100 text-gray-800 border-gray-200',
-        QUALIFIED: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        WARM: 'bg-blue-100 text-blue-800 border-blue-200',
-        HOT: 'bg-orange-100 text-orange-800 border-orange-200',
-        CONVERTED: 'bg-green-100 text-green-800 border-green-200',
-        COLD: 'bg-gray-100 text-gray-800 border-gray-200',
-        CROSS_SELLING: 'bg-purple-100 text-purple-800 border-purple-200',
+        NEW: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+        QUALIFIED: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700',
+        WARM: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700',
+        HOT: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-700',
+        CONVERTED: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700',
+        CUSTOMER: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700',
+        COLD: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+        EXIT: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700',
+        CROSS_SELLING: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700',
     };
 
     const priorityColors = {
-        fasttrack: 'bg-red-100 text-red-800 border-red-200',
-        normal: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        rendah: 'bg-green-100 text-green-800 border-green-200',
+        fasttrack: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700',
+        normal: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700',
+        rendah: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700',
     };
 
     const handleFilter = () => {
@@ -124,15 +126,15 @@ export default function LeadsIndex() {
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Kelola Leads</h1>
-                        <p className="text-gray-600">
+                    <div className="space-y-2">
+                        <h1 className="text-brand-primary">Kelola Leads</h1>
+                        <p className="text-muted-foreground text-lg">
                             {leads?.total || 0} leads ditemukan
                         </p>
                     </div>
                     {auth.user.role === 'marketing' && (
                         <Link href="/leads/create">
-                            <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
+                            <Button className="bg-brand-primary hover:bg-brand-primary-dark transition-colors touch-target">
                                 <Plus className="h-4 w-4 mr-2" />
                                 Tambah Lead
                             </Button>
@@ -141,25 +143,25 @@ export default function LeadsIndex() {
                 </div>
 
                 {/* Filters */}
-                <Card>
+                <Card className="border-border/50 shadow-soft">
                     <CardHeader>
-                        <CardTitle className="text-lg">Filter & Pencarian</CardTitle>
+                        <CardTitle className="text-brand-primary">Filter & Pencarian</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Cari nama, telepon, atau instansi..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="pl-10"
+                                    className="pl-10 touch-target"
                                     onKeyPress={(e) => e.key === 'Enter' && handleFilter()}
                                 />
                             </div>
                             
                             <Select value={status} onValueChange={setStatus}>
-                                <SelectTrigger>
+                                <SelectTrigger className="touch-target">
                                     <SelectValue placeholder="Semua Status" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -172,7 +174,7 @@ export default function LeadsIndex() {
 
                             {auth.user.role === 'super_user' && (
                                 <Select value={cabangId} onValueChange={setCabangId}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="touch-target">
                                         <SelectValue placeholder="Semua Cabang" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -187,11 +189,11 @@ export default function LeadsIndex() {
                             )}
 
                             <div className="flex gap-2">
-                                <Button onClick={handleFilter} className="flex-1">
+                                <Button onClick={handleFilter} className="flex-1 bg-brand-primary hover:bg-brand-primary-dark touch-target">
                                     <Search className="h-4 w-4 mr-2" />
                                     Cari
                                 </Button>
-                                <Button variant="outline" onClick={handleReset}>
+                                <Button variant="outline" onClick={handleReset} className="touch-target">
                                     Reset
                                 </Button>
                             </div>
@@ -202,73 +204,82 @@ export default function LeadsIndex() {
                 {/* Leads List - Mobile Optimized */}
                 <div className="space-y-4">
                     {leads?.data?.map((lead) => (
-                        <Card key={lead.id} className="hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
-                                <div className="space-y-3">
+                        <Card key={lead.id} className="border-border/50 shadow-soft hover:shadow-soft-md transition-all duration-200 hover:border-brand-primary/20">
+                            <CardContent className="p-4 sm:p-6">
+                                <div className="space-y-4">
                                     {/* Header */}
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold text-lg text-[#2B5235]">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1 space-y-2">
+                                            <h3 className="font-semibold text-lg text-brand-primary">
                                                 {lead.nama_pelanggan}
                                             </h3>
                                             {lead.nama_masjid_instansi && (
-                                                <p className="text-sm text-gray-600">
+                                                <p className="text-sm text-muted-foreground">
                                                     {lead.nama_masjid_instansi}
                                                 </p>
                                             )}
                                         </div>
-                                        <div className="flex gap-2">
-                                            <Badge className={statusColors[lead.status as keyof typeof statusColors]}>
+                                        <div className="flex flex-col sm:flex-row gap-2">
+                                            <Badge className={statusColors[lead.status as keyof typeof statusColors]} variant="outline">
                                                 {lead.status}
                                             </Badge>
-                                            <Badge className={priorityColors[lead.prioritas as keyof typeof priorityColors]}>
+                                            <Badge className={priorityColors[lead.prioritas as keyof typeof priorityColors]} variant="outline">
                                                 {lead.prioritas}
                                             </Badge>
                                         </div>
                                     </div>
 
                                     {/* Details */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                         <div className="flex items-center gap-2">
-                                            <Phone className="h-4 w-4 text-gray-400" />
+                                            <Phone className="h-4 w-4 text-muted-foreground" />
                                             <a 
                                                 href={`tel:${lead.no_whatsapp}`}
-                                                className="text-[#2B5235] hover:underline"
+                                                className="text-brand-primary hover:text-brand-primary-dark transition-colors font-medium"
                                             >
                                                 {formatPhoneNumber(lead.no_whatsapp)}
                                             </a>
                                         </div>
-                                        <div className="text-gray-600">
-                                            <span className="font-medium">Cabang:</span> {lead.cabang.nama_cabang}
+                                        <div className="text-muted-foreground">
+                                            <span className="font-medium text-foreground">Cabang:</span> {lead.cabang.nama_cabang}
                                         </div>
-                                        <div className="text-gray-600">
-                                            <span className="font-medium">Sumber:</span> {lead.sumber_leads.nama}
+                                        <div className="text-muted-foreground">
+                                            <span className="font-medium text-foreground">Sumber:</span> {lead.sumber_leads.nama}
                                         </div>
-                                        <div className="text-gray-600">
-                                            <span className="font-medium">PIC:</span> {lead.user.name}
+                                        <div className="text-muted-foreground">
+                                            <span className="font-medium text-foreground">PIC:</span> {lead.user.name}
                                         </div>
                                     </div>
 
                                     {/* Footer */}
-                                    <div className="flex items-center justify-between pt-2 border-t">
-                                        <div className="text-sm text-gray-500">
-                                            <div>{new Date(lead.tanggal_leads).toLocaleDateString('id-ID')}</div>
+                                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                                        <div className="text-sm space-y-1">
+                                            <div className="text-muted-foreground">
+                                                {new Date(lead.tanggal_leads).toLocaleDateString('id-ID', {
+                                                    weekday: 'short',
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                })}
+                                            </div>
                                             {lead.potensi_nilai && (
-                                                <div className="font-medium text-[#2B5235]">
+                                                <div className="font-semibold text-brand-primary">
                                                     {formatCurrency(lead.potensi_nilai)}
                                                 </div>
                                             )}
                                         </div>
                                         <div className="flex gap-2">
                                             <Link href={`/leads/${lead.id}`}>
-                                                <Button size="sm" variant="outline">
+                                                <Button size="sm" variant="outline" className="touch-target">
                                                     <Eye className="h-4 w-4" />
+                                                    <span className="sr-only">Lihat Detail</span>
                                                 </Button>
                                             </Link>
                                             {(auth.user.role === 'super_user' || auth.user.role === 'marketing') && (
                                                 <Link href={`/leads/${lead.id}/edit`}>
-                                                    <Button size="sm" variant="outline">
+                                                    <Button size="sm" variant="outline" className="touch-target">
                                                         <Edit className="h-4 w-4" />
+                                                        <span className="sr-only">Edit</span>
                                                     </Button>
                                                 </Link>
                                             )}
@@ -280,12 +291,19 @@ export default function LeadsIndex() {
                     ))}
 
                     {(!leads?.data || leads.data.length === 0) && (
-                        <Card>
-                            <CardContent className="text-center py-12">
-                                <p className="text-gray-500">Tidak ada leads ditemukan.</p>
+                        <Card className="border-border/50 shadow-soft">
+                            <CardContent className="text-center py-16">
+                                <Users className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
+                                <h3 className="text-lg font-semibold text-foreground mb-2">Tidak ada leads ditemukan</h3>
+                                <p className="text-muted-foreground mb-6">
+                                    {search || status !== 'all' || cabangId !== 'all' 
+                                        ? 'Coba ubah filter pencarian atau hapus semua filter'
+                                        : 'Mulai dengan menambahkan lead pertama Anda'
+                                    }
+                                </p>
                                 {auth.user.role === 'marketing' && (
-                                    <Link href="/leads/create" className="mt-4 inline-block">
-                                        <Button>
+                                    <Link href="/leads/create">
+                                        <Button className="bg-brand-primary hover:bg-brand-primary-dark touch-target">
                                             <Plus className="h-4 w-4 mr-2" />
                                             Tambah Lead Pertama
                                         </Button>
@@ -298,20 +316,30 @@ export default function LeadsIndex() {
 
                 {/* Pagination */}
                 {leads?.last_page > 1 && (
-                    <div className="flex justify-center">
-                        <div className="flex gap-2">
-                            {leads?.links?.map((link, index) => (
-                                <Button
-                                    key={index}
-                                    variant={link.active ? 'default' : 'outline'}
-                                    size="sm"
-                                    disabled={!link.url}
-                                    onClick={() => link.url && router.get(link.url)}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
-                    </div>
+                    <Card className="border-border/50 shadow-soft">
+                        <CardContent className="p-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div className="text-sm text-muted-foreground">
+                                    Menampilkan {leads.from} - {leads.to} dari {leads.total} leads
+                                </div>
+                                <div className="flex justify-center">
+                                    <div className="flex gap-1">
+                                        {leads?.links?.map((link, index) => (
+                                            <Button
+                                                key={index}
+                                                variant={link.active ? 'default' : 'outline'}
+                                                size="sm"
+                                                disabled={!link.url}
+                                                onClick={() => link.url && router.get(link.url)}
+                                                dangerouslySetInnerHTML={{ __html: link.label }}
+                                                className={`touch-target ${link.active ? 'bg-brand-primary hover:bg-brand-primary-dark' : ''}`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 )}
             </div>
         </AppLayout>

@@ -1,11 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ProgressRing } from '@/components/ui/progress-ring';
+import { StatusIndicator, getLeadStatusVariant, PriorityIndicator } from '@/components/ui/status-indicator';
+import { TrendChart, StatusDistribution } from '@/components/ui/mini-chart';
+import { AnalyticsDashboard } from '@/components/analytics-dashboard';
+import { showToast } from '@/lib/toast-helpers';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Users, Target, TrendingUp, Calendar, Plus } from 'lucide-react';
+import { Users, Target, TrendingUp, Calendar, Plus, Bell, ArrowUp, ArrowDown, BarChart3, Activity } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -45,20 +51,67 @@ interface DashboardProps {
             status: string;
         };
     }>;
+    analytics?: {
+        totalLeads: number;
+        conversionRate: number;
+        avgResponseTime: number;
+        activeFollowUps: number;
+        monthlyTrend: Array<{ period: string; leads: number; customers: number }>;
+        statusDistribution: Array<{ status: string; count: number; color: string }>;
+        conversionFunnel: Array<{ stage: string; count: number }>;
+        topPerformers: Array<{ name: string; leads: number; conversions: number }>;
+        recentActivities: Array<{ 
+            id: number; 
+            type: 'lead_created' | 'follow_up' | 'status_change'; 
+            description: string; 
+            timestamp: string;
+            user?: string;
+        }>;
+    };
 }
 
+// Skeleton loader for stats cards
+const StatsCardSkeleton = () => (
+    <Card className="border-border/50">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-8 w-8 rounded-lg" />
+        </CardHeader>
+        <CardContent>
+            <Skeleton className="h-8 w-16 mb-2" />
+            <Skeleton className="h-3 w-20" />
+        </CardContent>
+    </Card>
+);
+
+// Skeleton loader for lead items
+const LeadItemSkeleton = () => (
+    <div className="p-3 rounded-lg bg-muted/30">
+        <div className="flex items-center justify-between">
+            <div className="space-y-2 flex-1">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+            </div>
+            <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
+    </div>
+);
+
 export default function Dashboard() {
-    const { auth, stats, recent_leads, todays_followups } = usePage<DashboardProps>().props;
+    const { auth, stats, recent_leads, todays_followups, analytics } = usePage<DashboardProps>().props;
     const isMarketing = auth.user.role === 'marketing';
+    const canViewAnalytics = auth.user.role === 'supervisor' || auth.user.role === 'super-user';
 
     const statusColors = {
-        NEW: 'bg-gray-100 text-gray-800',
-        QUALIFIED: 'bg-yellow-100 text-yellow-800',
-        WARM: 'bg-blue-100 text-blue-800',
-        HOT: 'bg-orange-100 text-orange-800',
-        CONVERTED: 'bg-green-100 text-green-800',
-        COLD: 'bg-gray-100 text-gray-800',
-        CROSS_SELLING: 'bg-purple-100 text-purple-800',
+        NEW: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+        QUALIFIED: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700',
+        WARM: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700',
+        HOT: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-700',
+        CONVERTED: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700',
+        CUSTOMER: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700',
+        COLD: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+        EXIT: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700',
+        CROSS_SELLING: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700',
     };
 
     return (
@@ -67,93 +120,167 @@ export default function Dashboard() {
             
             <div className="space-y-6">
                 {/* Welcome Section */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="space-y-2">
+                        <h1 className="text-brand-primary">
                             Selamat Datang, {auth.user.name}
                         </h1>
-                        <p className="text-gray-600">
+                        <p className="text-muted-foreground text-lg">
                             {isMarketing ? 'Kelola leads dan follow-up Anda' : 'Pantau kinerja tim dan leads'}
                         </p>
                     </div>
-                    {isMarketing && (
-                        <Link href="/leads/create">
-                            <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
-                                <Plus className="h-4 w-4 mr-2" />
-                                Tambah Lead
-                            </Button>
-                        </Link>
-                    )}
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        {isMarketing && (
+                            <Link href="/leads/create">
+                                <Button className="bg-brand-primary hover:bg-brand-primary-dark transition-colors touch-target btn-ripple btn-press">
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Tambah Lead
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Leads</CardTitle>
+                            <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-brand-primary/10 transition-colors">
+                                <Users className="h-5 w-5 text-brand-primary" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{stats?.total_leads || 0}</div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-3xl font-bold text-brand-primary animate-scale-in">{stats?.total_leads || 0}</div>
+                                    <p className="text-xs text-muted-foreground mt-1">Total keseluruhan</p>
+                                </div>
+                                <ProgressRing 
+                                    progress={75} 
+                                    size={50} 
+                                    showPercentage={false}
+                                    color="var(--brand-primary)"
+                                />
+                            </div>
+                            <div className="mt-3">
+                                <TrendChart data={[45, 52, 48, 61, 58, 67, 73]} trend="up" />
+                            </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Leads Warm</CardTitle>
-                            <Target className="h-4 w-4 text-blue-600" />
+                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Leads Warm</CardTitle>
+                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950 group-hover:bg-blue-100 dark:group-hover:bg-blue-900 transition-colors">
+                                <Target className="h-5 w-5 text-status-warm" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-blue-600">{stats?.warm_leads || 0}</div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-3xl font-bold text-status-warm animate-scale-in" style={{ animationDelay: '0.2s' }}>{stats?.warm_leads || 0}</div>
+                                    <p className="text-xs text-muted-foreground mt-1">Berpotensi menjadi hot</p>
+                                </div>
+                                <div className="flex items-center gap-1 text-status-warm">
+                                    <ArrowUp className="h-4 w-4" />
+                                    <span className="text-sm font-medium">+12%</span>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Leads Hot</CardTitle>
-                            <TrendingUp className="h-4 w-4 text-orange-600" />
+                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Leads Hot</CardTitle>
+                            <div className="p-2 rounded-lg bg-orange-50 dark:bg-orange-950 group-hover:bg-orange-100 dark:group-hover:bg-orange-900 transition-colors">
+                                <TrendingUp className="h-5 w-5 text-status-hot" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-orange-600">{stats?.hot_leads || 0}</div>
+                            <div className="text-3xl font-bold text-status-hot animate-scale-in" style={{ animationDelay: '0.3s' }}>{stats?.hot_leads || 0}</div>
+                            <p className="text-xs text-muted-foreground mt-1">Siap untuk closing</p>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Customer</CardTitle>
-                            <TrendingUp className="h-4 w-4 text-green-600" />
+                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Customer</CardTitle>
+                            <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950 group-hover:bg-green-100 dark:group-hover:bg-green-900 transition-colors">
+                                <TrendingUp className="h-5 w-5 text-status-customer" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-green-600">{stats?.customers || 0}</div>
+                            <div className="text-3xl font-bold text-status-customer animate-scale-in" style={{ animationDelay: '0.4s' }}>{stats?.customers || 0}</div>
+                            <p className="text-xs text-muted-foreground mt-1">Berhasil closing</p>
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Status Distribution */}
+                <Card className="border-border/50 shadow-soft animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                    <CardHeader>
+                        <CardTitle className="text-brand-primary">Distribusi Status Leads</CardTitle>
+                        <CardDescription>
+                            Persentase leads berdasarkan status saat ini
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <StatusDistribution
+                                data={[
+                                    { status: 'WARM', count: stats?.warm_leads || 0, color: 'var(--status-warm)' },
+                                    { status: 'HOT', count: stats?.hot_leads || 0, color: 'var(--status-hot)' },
+                                    { status: 'CUSTOMER', count: stats?.customers || 0, color: 'var(--status-customer)' },
+                                ]}
+                            />
+                            <div className="grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                    <div className="text-2xl font-bold text-status-warm">{stats?.warm_leads || 0}</div>
+                                    <div className="text-xs text-muted-foreground">Warm</div>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-status-hot">{stats?.hot_leads || 0}</div>
+                                    <div className="text-xs text-muted-foreground">Hot</div>
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-status-customer">{stats?.customers || 0}</div>
+                                    <div className="text-xs text-muted-foreground">Customer</div>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {/* Follow-up Cards for Marketing */}
                 {isMarketing && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Follow-up Hari Ini</CardTitle>
-                                <Calendar className="h-4 w-4 text-[#2B5235]" />
+                        <Card className="border-border/50 shadow-soft hover:shadow-soft-md transition-shadow">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Follow-up Hari Ini</CardTitle>
+                                <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950">
+                                    <Calendar className="h-5 w-5 text-brand-primary" />
+                                </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-[#2B5235]">{stats?.todays_followups || 0}</div>
-                                <Link href="/follow-ups" className="text-xs text-muted-foreground hover:underline">
+                                <div className="text-3xl font-bold text-brand-primary">{stats?.todays_followups || 0}</div>
+                                <Link href="/follow-ups" className="text-sm text-brand-primary hover:text-brand-primary-dark transition-colors">
                                     Lihat semua →
                                 </Link>
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Follow-up Terlambat</CardTitle>
-                                <Calendar className="h-4 w-4 text-red-600" />
+                        <Card className={`border-border/50 shadow-soft hover:shadow-soft-md transition-shadow ${(stats?.overdue_followups || 0) > 0 ? 'border-destructive/20 bg-destructive/5' : ''}`}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Follow-up Terlambat</CardTitle>
+                                <div className="p-2 rounded-lg bg-red-50 dark:bg-red-950">
+                                    <Calendar className="h-5 w-5 text-destructive" />
+                                </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-red-600">{stats?.overdue_followups || 0}</div>
-                                <Link href="/follow-ups" className="text-xs text-muted-foreground hover:underline">
-                                    Tindak lanjuti →
+                                <div className="text-3xl font-bold text-destructive">{stats?.overdue_followups || 0}</div>
+                                <Link href="/follow-ups" className="text-sm text-destructive hover:text-destructive/80 transition-colors">
+                                    {(stats?.overdue_followups || 0) > 0 ? 'Tindak lanjuti sekarang →' : 'Semua terjadwal baik'}
                                 </Link>
                             </CardContent>
                         </Card>
@@ -163,32 +290,41 @@ export default function Dashboard() {
                 {/* Recent Leads & Today's Follow-ups */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Recent Leads */}
-                    <Card>
+                    <Card className="border-border/50 shadow-soft">
                         <CardHeader>
-                            <CardTitle>Leads Terbaru</CardTitle>
+                            <CardTitle className="text-brand-primary">Leads Terbaru</CardTitle>
                             <CardDescription>
                                 {recent_leads?.length || 0} leads terbaru
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {recent_leads?.map((lead) => (
-                                    <div key={lead.id} className="flex items-center justify-between">
-                                        <div>
-                                            <p className="font-medium">{lead.nama_pelanggan}</p>
-                                            <p className="text-sm text-gray-500">{lead.tanggal_leads}</p>
+                                    <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                                        <div className="space-y-1">
+                                            <p className="font-medium text-foreground">{lead.nama_pelanggan}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {new Date(lead.tanggal_leads).toLocaleDateString('id-ID', {
+                                                    weekday: 'short',
+                                                    day: 'numeric',
+                                                    month: 'short'
+                                                })}
+                                            </p>
                                         </div>
-                                        <Badge className={statusColors[lead.status as keyof typeof statusColors]}>
+                                        <StatusIndicator variant={getLeadStatusVariant(lead.status)}>
                                             {lead.status}
-                                        </Badge>
+                                        </StatusIndicator>
                                     </div>
                                 )) || (
-                                    <p className="text-gray-500 text-center py-4">Belum ada leads</p>
+                                    <div className="text-center py-8">
+                                        <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                        <p className="text-muted-foreground">Belum ada leads</p>
+                                    </div>
                                 )}
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-6">
                                 <Link href="/leads">
-                                    <Button variant="outline" className="w-full">
+                                    <Button variant="outline" className="w-full touch-target">
                                         Lihat Semua Leads
                                     </Button>
                                 </Link>
@@ -198,40 +334,46 @@ export default function Dashboard() {
 
                     {/* Today's Follow-ups for Marketing */}
                     {isMarketing && (
-                        <Card>
+                        <Card className="border-border/50 shadow-soft">
                             <CardHeader>
-                                <CardTitle>Follow-up Hari Ini</CardTitle>
+                                <CardTitle className="text-brand-primary">Follow-up Hari Ini</CardTitle>
                                 <CardDescription>
                                     {todays_followups?.length || 0} follow-up dijadwalkan
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     {todays_followups?.map((followup) => (
-                                        <div key={followup.id} className="flex items-center justify-between">
-                                            <div>
-                                                <p className="font-medium">{followup.leads.nama_pelanggan}</p>
-                                                <p className="text-sm text-gray-500">{followup.stage}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <Badge className={statusColors[followup.leads.status as keyof typeof statusColors]}>
-                                                    {followup.leads.status}
-                                                </Badge>
-                                                <p className="text-xs text-gray-500 mt-1">
-                                                    {new Date(followup.scheduled_at).toLocaleTimeString('id-ID', { 
-                                                        hour: '2-digit', 
-                                                        minute: '2-digit' 
-                                                    })}
-                                                </p>
+                                        <div key={followup.id} className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                                            <div className="flex items-start justify-between">
+                                                <div className="space-y-1 flex-1">
+                                                    <p className="font-medium text-foreground">{followup.leads.nama_pelanggan}</p>
+                                                    <p className="text-sm text-brand-primary font-medium">{followup.stage}</p>
+                                                </div>
+                                                <div className="text-right space-y-2">
+                                                    <StatusIndicator variant={getLeadStatusVariant(followup.leads.status)} size="sm">
+                                                        {followup.leads.status}
+                                                    </StatusIndicator>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {new Date(followup.scheduled_at).toLocaleTimeString('id-ID', { 
+                                                            hour: '2-digit', 
+                                                            minute: '2-digit' 
+                                                        })}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     )) || (
-                                        <p className="text-gray-500 text-center py-4">Tidak ada follow-up hari ini</p>
+                                        <div className="text-center py-8">
+                                            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                            <p className="text-muted-foreground">Tidak ada follow-up hari ini</p>
+                                            <p className="text-sm text-muted-foreground mt-2">Nikmati hari yang santai!</p>
+                                        </div>
                                     )}
                                 </div>
-                                <div className="mt-4">
+                                <div className="mt-6">
                                     <Link href="/follow-ups">
-                                        <Button variant="outline" className="w-full">
+                                        <Button variant="outline" className="w-full touch-target">
                                             Lihat Semua Follow-up
                                         </Button>
                                     </Link>
@@ -240,6 +382,85 @@ export default function Dashboard() {
                         </Card>
                     )}
                 </div>
+
+                {/* Advanced Analytics Section - Only for Supervisors and Super Users */}
+                {canViewAnalytics && analytics && (
+                    <div className="mt-12">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 rounded-lg bg-brand-primary/10">
+                                <BarChart3 className="h-6 w-6 text-brand-primary" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-semibold text-brand-primary">Advanced Analytics</h2>
+                                <p className="text-sm text-muted-foreground">
+                                    Insight mendalam untuk pengambilan keputusan strategis
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <AnalyticsDashboard 
+                            data={analytics} 
+                            period="30d"
+                        />
+                    </div>
+                )}
+
+                {/* Quick Analytics Preview for Marketing */}
+                {isMarketing && (
+                    <div className="mt-8">
+                        <Card className="border-border/50 shadow-soft">
+                            <CardHeader>
+                                <CardTitle className="text-brand-primary flex items-center gap-2">
+                                    <Activity className="h-5 w-5" />
+                                    Performance Snapshot
+                                </CardTitle>
+                                <CardDescription>
+                                    Ringkasan kinerja Anda bulan ini
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div className="text-center p-4 rounded-lg bg-muted/30">
+                                        <div className="text-2xl font-bold text-brand-primary">{stats?.total_leads || 0}</div>
+                                        <div className="text-sm text-muted-foreground">Total Leads</div>
+                                        <div className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
+                                            <ArrowUp className="h-3 w-3" />
+                                            +8%
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="text-center p-4 rounded-lg bg-muted/30">
+                                        <div className="text-2xl font-bold text-green-600">{stats?.customers || 0}</div>
+                                        <div className="text-sm text-muted-foreground">Customers</div>
+                                        <div className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
+                                            <ArrowUp className="h-3 w-3" />
+                                            +12%
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="text-center p-4 rounded-lg bg-muted/30">
+                                        <div className="text-2xl font-bold text-orange-600">
+                                            {stats?.total_leads > 0 ? Math.round((stats.customers / stats.total_leads) * 100) : 0}%
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">Conversion Rate</div>
+                                        <div className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
+                                            <ArrowUp className="h-3 w-3" />
+                                            +3%
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="text-center p-4 rounded-lg bg-muted/30">
+                                        <div className="text-2xl font-bold text-purple-600">{stats?.todays_followups || 0}</div>
+                                        <div className="text-sm text-muted-foreground">Follow-ups Hari Ini</div>
+                                        <div className="text-xs text-muted-foreground mt-1">
+                                            {stats?.overdue_followups || 0} terlambat
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
             </div>
         </AppLayout>
     );

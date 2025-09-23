@@ -60,8 +60,8 @@ export default function FollowUpTracker({ followUps, stages, leadId }: FollowUpT
 
         // Each follow-up record represents one attempt for this stage
         // We need to show progress for up to 3 attempts total for the stage
-        let attempts = [false, false, false];
-        let attemptDates = [null, null, null];
+        const attempts = [false, false, false];
+        const attemptDates = [null, null, null];
         let hasResponse = false;
 
         // Sort follow-ups by attempt number to ensure correct order
