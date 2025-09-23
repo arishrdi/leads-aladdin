@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class ReportController extends Controller
 {
@@ -53,16 +55,16 @@ class ReportController extends Controller
 
         // Get summary statistics
         $totalLeads = (clone $leadsQuery)->count();
-        $newLeads = (clone $leadsQuery)->where('status', 'NEW')->count();
-        $qualifiedLeads = (clone $leadsQuery)->where('status', 'QUALIFIED')->count();
         $warmLeads = (clone $leadsQuery)->where('status', 'WARM')->count();
         $hotLeads = (clone $leadsQuery)->where('status', 'HOT')->count();
-        $convertedLeads = (clone $leadsQuery)->where('status', 'CONVERTED')->count();
+        $customerLeads = (clone $leadsQuery)->where('status', 'CUSTOMER')->count();
+        $exitLeads = (clone $leadsQuery)->where('status', 'EXIT')->count();
         $coldLeads = (clone $leadsQuery)->where('status', 'COLD')->count();
+        $crossSellingLeads = (clone $leadsQuery)->where('status', 'CROSS_SELLING')->count();
         
-        $totalRevenue = (clone $leadsQuery)->where('status', 'CONVERTED')->sum('nominal_deal') ?? 0;
-        $averageDeal = $convertedLeads > 0 ? $totalRevenue / $convertedLeads : 0;
-        $conversionRate = $totalLeads > 0 ? ($convertedLeads / $totalLeads) * 100 : 0;
+        $totalRevenue = (clone $leadsQuery)->where('status', 'CUSTOMER')->sum('nominal_deal') ?? 0;
+        $averageDeal = $customerLeads > 0 ? $totalRevenue / $customerLeads : 0;
+        $conversionRate = $totalLeads > 0 ? ($customerLeads / $totalLeads) * 100 : 0;
 
         // Lead sources analysis
         $leadSources = (clone $leadsQuery)
@@ -83,8 +85,8 @@ class ReportController extends Controller
         $topPerformers = (clone $leadsQuery)
             ->select('users.name', 'users.email', 
                 DB::raw('count(*) as total_leads'),
-                DB::raw('sum(case when status = "CONVERTED" then 1 else 0 end) as converted_leads'),
-                DB::raw('sum(case when status = "CONVERTED" then nominal_deal else 0 end) as total_revenue')
+                DB::raw('sum(case when status = "CUSTOMER" then 1 else 0 end) as converted_leads'),
+                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue')
             )
             ->join('users', 'leads.user_id', '=', 'users.id')
             ->groupBy('users.id', 'users.name', 'users.email')
@@ -96,8 +98,8 @@ class ReportController extends Controller
         $branchPerformance = (clone $leadsQuery)
             ->select('cabangs.nama_cabang', 
                 DB::raw('count(*) as total_leads'),
-                DB::raw('sum(case when status = "CONVERTED" then 1 else 0 end) as converted_leads'),
-                DB::raw('sum(case when status = "CONVERTED" then nominal_deal else 0 end) as total_revenue')
+                DB::raw('sum(case when status = "CUSTOMER" then 1 else 0 end) as converted_leads'),
+                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue')
             )
             ->join('cabangs', 'leads.cabang_id', '=', 'cabangs.id')
             ->groupBy('cabangs.id', 'cabangs.nama_cabang')
@@ -132,12 +134,12 @@ class ReportController extends Controller
         return Inertia::render('reports/index', [
             'summary' => [
                 'total_leads' => $totalLeads,
-                'new_leads' => $newLeads,
-                'qualified_leads' => $qualifiedLeads,
                 'warm_leads' => $warmLeads,
                 'hot_leads' => $hotLeads,
-                'converted_leads' => $convertedLeads,
+                'customer_leads' => $customerLeads,
+                'exit_leads' => $exitLeads,
                 'cold_leads' => $coldLeads,
+                'cross_selling_leads' => $crossSellingLeads,
                 'total_revenue' => $totalRevenue,
                 'average_deal' => $averageDeal,
                 'conversion_rate' => $conversionRate,
@@ -265,11 +267,126 @@ class ReportController extends Controller
 
     private function exportToPdf($leads, $dateFrom, $dateTo)
     {
-        // For now, return a simple response. In production, you'd use a PDF library like DomPDF
-        return response()->json([
-            'message' => 'PDF export akan diimplementasikan dengan library PDF.',
-            'total_records' => $leads->count(),
-            'date_range' => "{$dateFrom} to {$dateTo}"
+        $user = auth()->user();
+        $activeBranch = request()->get('active_branch_object');
+        
+        // Build query for summary data (reuse logic from index method)
+        $leadsQuery = Leads::query();
+        
+        if ($activeBranch) {
+            $leadsQuery->where('cabang_id', $activeBranch->id);
+        } elseif ($user->role === 'supervisor') {
+            $userCabangIds = $user->cabangs->pluck('id');
+            $leadsQuery->whereIn('cabang_id', $userCabangIds);
+        }
+        
+        $leadsQuery->whereBetween('leads.created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+        
+        if (request()->cabang_id) {
+            $leadsQuery->where('cabang_id', request()->cabang_id);
+        }
+        
+        if (request()->user_id) {
+            $leadsQuery->where('user_id', request()->user_id);
+        }
+
+        // Get summary statistics
+        $totalLeads = (clone $leadsQuery)->count();
+        $warmLeads = (clone $leadsQuery)->where('status', 'WARM')->count();
+        $hotLeads = (clone $leadsQuery)->where('status', 'HOT')->count();
+        $customerLeads = (clone $leadsQuery)->where('status', 'CUSTOMER')->count();
+        $exitLeads = (clone $leadsQuery)->where('status', 'EXIT')->count();
+        $coldLeads = (clone $leadsQuery)->where('status', 'COLD')->count();
+        $crossSellingLeads = (clone $leadsQuery)->where('status', 'CROSS_SELLING')->count();
+        
+        $totalRevenue = (clone $leadsQuery)->where('status', 'CUSTOMER')->sum('nominal_deal') ?? 0;
+        $averageDeal = $customerLeads > 0 ? $totalRevenue / $customerLeads : 0;
+        $conversionRate = $totalLeads > 0 ? ($customerLeads / $totalLeads) * 100 : 0;
+
+        // Lead sources analysis
+        $leadSources = (clone $leadsQuery)
+            ->select('sumber_leads.nama', DB::raw('count(*) as total'))
+            ->join('sumber_leads', 'leads.sumber_leads_id', '=', 'sumber_leads.id')
+            ->groupBy('sumber_leads.id', 'sumber_leads.nama')
+            ->orderByDesc('total')
+            ->get();
+
+        // Top performers
+        $topPerformers = (clone $leadsQuery)
+            ->select('users.name', 'users.email', 
+                DB::raw('count(*) as total_leads'),
+                DB::raw('sum(case when status = "CUSTOMER" then 1 else 0 end) as converted_leads'),
+                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue')
+            )
+            ->join('users', 'leads.user_id', '=', 'users.id')
+            ->groupBy('users.id', 'users.name', 'users.email')
+            ->orderByDesc('converted_leads')
+            ->limit(10)
+            ->get();
+
+        // Branch performance
+        $branchPerformance = (clone $leadsQuery)
+            ->select('cabangs.nama_cabang', 
+                DB::raw('count(*) as total_leads'),
+                DB::raw('sum(case when status = "CUSTOMER" then 1 else 0 end) as converted_leads'),
+                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue')
+            )
+            ->join('cabangs', 'leads.cabang_id', '=', 'cabangs.id')
+            ->groupBy('cabangs.id', 'cabangs.nama_cabang')
+            ->orderByDesc('total_revenue')
+            ->get();
+
+        $data = [
+            'summary' => [
+                'total_leads' => $totalLeads,
+                'warm_leads' => $warmLeads,
+                'hot_leads' => $hotLeads,
+                'customer_leads' => $customerLeads,
+                'exit_leads' => $exitLeads,
+                'cold_leads' => $coldLeads,
+                'cross_selling_leads' => $crossSellingLeads,
+                'total_revenue' => $totalRevenue,
+                'average_deal' => $averageDeal,
+                'conversion_rate' => $conversionRate,
+            ],
+            'charts' => [
+                'lead_sources' => $leadSources,
+            ],
+            'performance' => [
+                'top_performers' => $topPerformers,
+                'branch_performance' => $branchPerformance,
+            ],
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+        ];
+
+        // Configure DomPDF options
+        $options = new Options();
+        $options->set('defaultFont', 'DejaVu Sans');
+        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
+        
+        // Create DomPDF instance
+        $dompdf = new Dompdf($options);
+        
+        // Load HTML content
+        $html = view('reports.pdf', $data)->render();
+        $dompdf->loadHtml($html);
+        
+        // Set paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+        
+        // Render the PDF
+        $dompdf->render();
+        
+        // Generate filename
+        $filename = "laporan_leads_{$dateFrom}_to_{$dateTo}.pdf";
+        
+        // Return the PDF as download
+        return response()->streamDownload(function () use ($dompdf) {
+            echo $dompdf->output();
+        }, $filename, [
+            'Content-Type' => 'application/pdf',
         ]);
     }
 }

@@ -19,12 +19,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Summary {
     total_leads: number;
-    new_leads: number;
-    qualified_leads: number;
     warm_leads: number;
     hot_leads: number;
-    converted_leads: number;
+    customer_leads: number;
+    exit_leads: number;
     cold_leads: number;
+    cross_selling_leads: number;
     total_revenue: number;
     average_deal: number;
     conversion_rate: number;
@@ -299,8 +299,8 @@ export default function ReportsIndex() {
                                     <TrendingUp className="h-5 w-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Konversi</p>
-                                    <p className="text-2xl font-bold text-green-600">{summary.converted_leads}</p>
+                                    <p className="text-sm text-gray-600">Customer</p>
+                                    <p className="text-2xl font-bold text-green-600">{summary.customer_leads}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -313,7 +313,7 @@ export default function ReportsIndex() {
                                     <DollarSign className="h-5 w-5 text-[#2B5235]" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Total Revenue</p>
+                                    <p className="text-sm text-gray-600">Total Pendapatan</p>
                                     <p className="text-lg font-bold text-[#2B5235]">
                                         {formatCurrency(summary.total_revenue)}
                                     </p>
@@ -329,7 +329,7 @@ export default function ReportsIndex() {
                                     <Percent className="h-5 w-5 text-purple-600" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Conversion Rate</p>
+                                    <p className="text-sm text-gray-600">Tingkat Konversi</p>
                                     <p className="text-2xl font-bold text-purple-600">
                                         {Number(summary.conversion_rate || 0).toFixed(1)}%
                                     </p>
@@ -358,18 +358,10 @@ export default function ReportsIndex() {
                 {/* Lead Status Breakdown */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Breakdown Status Leads</CardTitle>
+                        <CardTitle>Rincian Status Leads</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-                            <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                <div className="text-2xl font-bold text-blue-600">{summary.new_leads}</div>
-                                <div className="text-sm text-blue-800">NEW</div>
-                            </div>
-                            <div className="text-center p-3 bg-purple-50 rounded-lg">
-                                <div className="text-2xl font-bold text-purple-600">{summary.qualified_leads}</div>
-                                <div className="text-sm text-purple-800">QUALIFIED</div>
-                            </div>
                             <div className="text-center p-3 bg-yellow-50 rounded-lg">
                                 <div className="text-2xl font-bold text-yellow-600">{summary.warm_leads}</div>
                                 <div className="text-sm text-yellow-800">WARM</div>
@@ -379,12 +371,20 @@ export default function ReportsIndex() {
                                 <div className="text-sm text-orange-800">HOT</div>
                             </div>
                             <div className="text-center p-3 bg-green-50 rounded-lg">
-                                <div className="text-2xl font-bold text-green-600">{summary.converted_leads}</div>
-                                <div className="text-sm text-green-800">CONVERTED</div>
+                                <div className="text-2xl font-bold text-green-600">{summary.customer_leads}</div>
+                                <div className="text-sm text-green-800">CUSTOMER</div>
+                            </div>
+                            <div className="text-center p-3 bg-red-50 rounded-lg">
+                                <div className="text-2xl font-bold text-red-600">{summary.exit_leads}</div>
+                                <div className="text-sm text-red-800">EXIT</div>
                             </div>
                             <div className="text-center p-3 bg-gray-50 rounded-lg">
                                 <div className="text-2xl font-bold text-gray-600">{summary.cold_leads}</div>
                                 <div className="text-sm text-gray-800">COLD</div>
+                            </div>
+                            <div className="text-center p-3 bg-purple-50 rounded-lg">
+                                <div className="text-2xl font-bold text-purple-600">{summary.cross_selling_leads}</div>
+                                <div className="text-sm text-purple-800">CROSS_SELLING</div>
                             </div>
                         </div>
                     </CardContent>
@@ -434,7 +434,7 @@ export default function ReportsIndex() {
                                         <div className="flex items-center gap-3">
                                             <Badge variant="outline">{stat.total} FU</Badge>
                                             <span className="text-sm text-gray-500">
-                                                ~{Number(stat.avg_attempts || 0).toFixed(1)} attempts
+                                                ~{Number(stat.avg_attempts || 0).toFixed(1)} percobaan
                                             </span>
                                         </div>
                                     </div>
@@ -450,7 +450,7 @@ export default function ReportsIndex() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Users className="h-5 w-5" />
-                                Top Performers
+                                Marketing Terbaik
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
