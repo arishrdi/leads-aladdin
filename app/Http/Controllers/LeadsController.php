@@ -103,7 +103,7 @@ class LeadsController extends Controller
             'potensi_nilai' => 'nullable|numeric|min:0',
             'tipe_karpet_id' => 'nullable|exists:tipe_karpets,id',
             'cabang_id' => 'required|exists:cabangs,id',
-            'status' => 'required|in:NEW,QUALIFIED,WARM,HOT,CONVERTED,COLD,CROSS_SELLING',
+            'status' => 'required|in:WARM,HOT,CUSTOMER,EXIT,COLD,CROSS_SELLING',
         ]);
 
         // Format phone number
@@ -176,7 +176,7 @@ class LeadsController extends Controller
             'potensi_nilai' => 'nullable|numeric|min:0',
             'tipe_karpet_id' => 'nullable|exists:tipe_karpets,id',
             'cabang_id' => 'required|exists:cabangs,id',
-            'status' => 'required|in:NEW,QUALIFIED,WARM,HOT,CONVERTED,COLD,CROSS_SELLING',
+            'status' => 'required|in:WARM,HOT,CUSTOMER,EXIT,COLD,CROSS_SELLING',
         ]);
 
         // Format phone number

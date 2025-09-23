@@ -63,7 +63,7 @@ class LeadsSeeder extends Seeder
                 'no_whatsapp' => '628456789012',
                 'nama_masjid_instansi' => 'Masjid At-Taqwa',
                 'alamat' => 'Jl. Pesantren No. 45, Tangerang',
-                'status' => 'CONVERTED',
+                'status' => 'CUSTOMER',
                 'budget_min' => 30000000,
                 'budget_max' => 40000000,
                 'tanggal_closing' => now()->subDays(5),
@@ -140,7 +140,7 @@ class LeadsSeeder extends Seeder
 
         // Add some more random leads
         for ($i = 0; $i < 20; $i++) {
-            $status = $faker->randomElement(['NEW', 'WARM', 'HOT', 'COLD', 'CONVERTED']);
+            $status = $faker->randomElement(['WARM', 'HOT', 'CUSTOMER', 'EXIT', 'COLD', 'CROSS_SELLING']);
             $budgetMin = $faker->numberBetween(5, 50) * 1000000;
             $budgetMax = $budgetMin + $faker->numberBetween(10, 50) * 1000000;
             $createdAt = $faker->dateTimeBetween('-60 days', 'now');
@@ -163,8 +163,8 @@ class LeadsSeeder extends Seeder
                 'status' => $status,
                 'budget_min' => $budgetMin,
                 'budget_max' => $budgetMax,
-                'tanggal_closing' => $status === 'CONVERTED' ? $faker->dateTimeBetween('-30 days', 'now') : null,
-                'nominal_deal' => $status === 'CONVERTED' ? $faker->numberBetween($budgetMin, $budgetMax) : null,
+                'tanggal_closing' => $status === 'CUSTOMER' ? $faker->dateTimeBetween('-30 days', 'now') : null,
+                'nominal_deal' => $status === 'CUSTOMER' ? $faker->numberBetween($budgetMin, $budgetMax) : null,
                 'catatan' => $faker->sentence(10),
                 'created_at' => $createdAt,
             ]);

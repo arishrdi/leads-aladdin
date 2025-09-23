@@ -2,11 +2,10 @@
 
 return [
     'statuses' => [
-        'NEW' => 'Lead baru yang belum diproses',
-        'QUALIFIED' => 'Lead yang sudah dikualifikasi',
         'WARM' => 'Calon customer yang menghubungi untuk pertama kali',
         'HOT' => 'Sudah minta desain (smarttechno) / survey lokasi (Aladdin Karpet)',
-        'CONVERTED' => 'Memutuskan untuk membeli',
+        'CUSTOMER' => 'Memutuskan untuk membeli',
+        'EXIT' => 'Memutuskan untuk tidak membeli',
         'COLD' => 'Customer tidak ada kejelasan setelah follow up 3 kali/ tidak ada nomer yg bisa dihubungi',
         'CROSS_SELLING' => 'Testimoni dan penawaran produk lain',
     ],

@@ -33,7 +33,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('tipe_karpet_id')->nullable()->constrained('tipe_karpets');
             $table->foreignId('cabang_id')->constrained('cabangs');
-            $table->enum('status', ['NEW', 'QUALIFIED', 'WARM', 'HOT', 'CONVERTED', 'COLD', 'CROSS_SELLING'])->default('NEW');
+            $table->enum('status', ['WARM', 'HOT', 'CUSTOMER', 'EXIT', 'COLD', 'CROSS_SELLING'])->default('WARM');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
