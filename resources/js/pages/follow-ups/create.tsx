@@ -244,32 +244,6 @@ export default function CreateFollowUp() {
                     </Card>
                 </div>
 
-                {/* Quick Tips */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Tips Follow-up yang Efektif</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <h4 className="font-medium mb-2">Waktu Terbaik:</h4>
-                                <ul className="space-y-1 text-gray-600">
-                                    <li>• Pagi: 09:00 - 11:00</li>
-                                    <li>• Sore: 14:00 - 16:00</li>
-                                    <li>• Hindari jam makan siang</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="font-medium mb-2">Persiapan:</h4>
-                                <ul className="space-y-1 text-gray-600">
-                                    <li>• Baca catatan follow-up sebelumnya</li>
-                                    <li>• Siapkan pertanyaan yang relevan</li>
-                                    <li>• Pastikan koneksi telepon stabil</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
         </AppLayout>
     );

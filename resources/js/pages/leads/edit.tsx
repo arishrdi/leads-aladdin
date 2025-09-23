@@ -23,6 +23,7 @@ interface Lead {
     nama_pelanggan: string;
     no_whatsapp: string;
     nama_masjid_instansi: string;
+    alamat: string;
     sumber_leads_id: number;
     catatan: string;
     alasan_closing: string;
@@ -53,8 +54,8 @@ interface PageProps {
         statuses: Record<string, string>;
         prioritas: Record<string, string>;
         sapaan: Record<string, string>;
-        alasanClosing: string[];
-        alasanTidakClosing: string[];
+        alasanClosing: Record<string, string>;
+        alasanTidakClosing: Record<string, string>;
     };
 }
 
@@ -67,6 +68,7 @@ export default function EditLead() {
         nama_pelanggan: lead.nama_pelanggan,
         no_whatsapp: lead.no_whatsapp,
         nama_masjid_instansi: lead.nama_masjid_instansi || '',
+        alamat: lead.alamat || '',
         sumber_leads_id: lead.sumber_leads_id.toString(),
         catatan: lead.catatan || '',
         alasan_closing: lead.alasan_closing || '',
@@ -208,6 +210,21 @@ export default function EditLead() {
                                 />
                                 {errors.nama_masjid_instansi && (
                                     <p className="text-sm text-red-500 mt-1">{errors.nama_masjid_instansi}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <Label htmlFor="alamat">Alamat</Label>
+                                <Textarea
+                                    id="alamat"
+                                    value={data.alamat}
+                                    onChange={(e) => setData('alamat', e.target.value)}
+                                    placeholder="Alamat lengkap pelanggan (opsional)"
+                                    rows={2}
+                                    className={errors.alamat ? 'border-red-500' : ''}
+                                />
+                                {errors.alamat && (
+                                    <p className="text-sm text-red-500 mt-1">{errors.alamat}</p>
                                 )}
                             </div>
                         </CardContent>
@@ -377,8 +394,8 @@ export default function EditLead() {
                                                 <SelectValue placeholder="Pilih alasan closing" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {config.alasanClosing.map((alasan) => (
-                                                    <SelectItem key={alasan} value={alasan}>{alasan}</SelectItem>
+                                                {Object.entries(config.alasanClosing).map(([key, value]) => (
+                                                    <SelectItem key={key} value={key}>{value}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -396,8 +413,8 @@ export default function EditLead() {
                                                 <SelectValue placeholder="Pilih alasan tidak closing" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {config.alasanTidakClosing.map((alasan) => (
-                                                    <SelectItem key={alasan} value={alasan}>{alasan}</SelectItem>
+                                                {Object.entries(config.alasanTidakClosing).map(([key, value]) => (
+                                                    <SelectItem key={key} value={key}>{value}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>

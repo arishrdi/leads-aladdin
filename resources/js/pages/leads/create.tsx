@@ -45,6 +45,7 @@ export default function CreateLead() {
         nama_pelanggan: '',
         no_whatsapp: '',
         nama_masjid_instansi: '',
+        alamat: '',
         sumber_leads_id: '',
         catatan: '',
         prioritas: 'normal',
@@ -194,6 +195,21 @@ export default function CreateLead() {
                                 />
                                 {errors.nama_masjid_instansi && (
                                     <p className="text-sm text-red-500 mt-1">{errors.nama_masjid_instansi}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <Label htmlFor="alamat">Alamat</Label>
+                                <Textarea
+                                    id="alamat"
+                                    value={data.alamat}
+                                    onChange={(e) => setData('alamat', e.target.value)}
+                                    placeholder="Alamat lengkap pelanggan (opsional)"
+                                    rows={2}
+                                    className={errors.alamat ? 'border-red-500' : ''}
+                                />
+                                {errors.alamat && (
+                                    <p className="text-sm text-red-500 mt-1">{errors.alamat}</p>
                                 )}
                             </div>
                         </CardContent>

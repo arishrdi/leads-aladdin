@@ -186,7 +186,7 @@ export default function FollowUpsIndex() {
                             )}
                             {followUp.auto_scheduled && (
                                 <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700">
-                                    Auto-scheduled
+                                    Jadwal Otomatis
                                 </Badge>
                             )}
                         </div>
@@ -354,7 +354,7 @@ export default function FollowUpsIndex() {
                 </Card>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <Card className="border-border/50 shadow-soft hover:shadow-soft-md transition-shadow">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                             <CardTitle className="text-sm font-medium text-muted-foreground">Total Follow-up</CardTitle>
@@ -406,7 +406,7 @@ export default function FollowUpsIndex() {
                             <p className="text-xs text-muted-foreground mt-1">Tingkat respons</p>
                         </CardContent>
                     </Card>
-                </div>
+                </div> */}
 
                 {/* Follow-ups Tabs - Default View */}
                 {!hasDateFilter && (
