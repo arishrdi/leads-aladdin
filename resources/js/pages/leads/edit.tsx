@@ -4,11 +4,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Save, ArrowLeft } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Save, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
+import { FormEventHandler, useState, useEffect } from 'react';
+import { format, parseISO } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -62,6 +67,9 @@ interface PageProps {
 export default function EditLead() {
     const { lead, sumberLeads, tipeKarpets, cabangs, config } = usePage<PageProps>().props;
     
+    const [selectedDate, setSelectedDate] = useState<Date>(parseISO(lead.tanggal_leads));
+    const [isDateOpen, setIsDateOpen] = useState(false);
+    
     const { data, setData, put, processing, errors } = useForm({
         tanggal_leads: lead.tanggal_leads,
         sapaan: lead.sapaan,
@@ -75,7 +83,7 @@ export default function EditLead() {
         alasan_tidak_closing: lead.alasan_tidak_closing || '',
         prioritas: lead.prioritas,
         kebutuhan_karpet: lead.kebutuhan_karpet || '',
-        potensi_nilai: lead.potensi_nilai?.toString() || '',
+        potensi_nilai: lead.potensi_nilai ? lead.potensi_nilai.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '',
         tipe_karpet_id: lead.tipe_karpet_id?.toString() || '',
         cabang_id: lead.cabang_id.toString(),
         status: lead.status,
@@ -83,7 +91,8 @@ export default function EditLead() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(`/leads/${lead.id}`);
+        
+        put(`/leads/${lead.id}`, data);
     };
 
     const formatPhoneNumber = (value: string) => {
@@ -116,6 +125,35 @@ export default function EditLead() {
         return value;
     };
 
+    const formatCurrency = (value: string) => {
+        // Remove non-numeric characters
+        const numbers = value.replace(/\D/g, '');
+        
+        // Format with thousands separator
+        if (numbers) {
+            return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+        return '';
+    };
+
+    const handleCurrencyChange = (value: string) => {
+        const formatted = formatCurrency(value);
+        setData('potensi_nilai', formatted);
+    };
+
+    const getCurrencyValue = () => {
+        // Remove dots for submission
+        return data.potensi_nilai.replace(/\./g, '');
+    };
+
+    const handleDateSelect = (date: Date | undefined) => {
+        if (date) {
+            setSelectedDate(date);
+            setData('tanggal_leads', date.toISOString().split('T')[0]);
+            setIsDateOpen(false);
+        }
+    };
+
     const showClosingFields = ['CUSTOMER', 'EXIT'].includes(data.status);
 
     return (
@@ -144,13 +182,30 @@ export default function EditLead() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <Label htmlFor="tanggal_leads">Tanggal Lead *</Label>
-                                    <Input
-                                        id="tanggal_leads"
-                                        type="date"
-                                        value={data.tanggal_leads}
-                                        onChange={(e) => setData('tanggal_leads', e.target.value)}
-                                        className={errors.tanggal_leads ? 'border-red-500' : ''}
-                                    />
+                                    <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !selectedDate && "text-muted-foreground",
+                                                    errors.tanggal_leads && "border-red-500"
+                                                )}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {selectedDate ? format(selectedDate, "dd MMMM yyyy", { locale: id }) : "Pilih tanggal"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={selectedDate}
+                                                onSelect={handleDateSelect}
+                                                initialFocus
+                                                locale={id}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                     {errors.tanggal_leads && (
                                         <p className="text-sm text-red-500 mt-1">{errors.tanggal_leads}</p>
                                     )}
@@ -349,13 +404,21 @@ export default function EditLead() {
 
                             <div>
                                 <Label htmlFor="potensi_nilai">Potensi Nilai (Rupiah)</Label>
-                                <Input
-                                    id="potensi_nilai"
-                                    type="number"
-                                    value={data.potensi_nilai}
-                                    onChange={(e) => setData('potensi_nilai', e.target.value)}
-                                    className={errors.potensi_nilai ? 'border-red-500' : ''}
-                                />
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">Rp</span>
+                                    <Input
+                                        id="potensi_nilai"
+                                        type="text"
+                                        value={data.potensi_nilai}
+                                        onChange={(e) => handleCurrencyChange(e.target.value)}
+                                        placeholder="0"
+                                        className={cn(
+                                            "pl-10",
+                                            errors.potensi_nilai ? 'border-red-500' : ''
+                                        )}
+                                    />
+                                </div>
+                               
                                 {errors.potensi_nilai && (
                                     <p className="text-sm text-red-500 mt-1">{errors.potensi_nilai}</p>
                                 )}

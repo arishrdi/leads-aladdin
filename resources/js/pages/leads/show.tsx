@@ -110,6 +110,12 @@ export default function ShowLead() {
         no_response: 'bg-red-100 text-red-800',
     };
 
+    const followUpStatusLabels = {
+        scheduled: 'Dijadwalkan',
+        completed: 'Selesai',
+        no_response: 'Tidak Ada Respon',
+    };
+
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -344,7 +350,7 @@ export default function ShowLead() {
                                                                 variant="outline" 
                                                                 className={followUpStatusColors[followUp.status as keyof typeof followUpStatusColors]}
                                                             >
-                                                                {followUp.status}
+                                                                {followUpStatusLabels[followUp.status as keyof typeof followUpStatusLabels]}
                                                             </Badge>
                                                             <span className="text-xs text-gray-500">
                                                                 Percobaan #{followUp.attempt}

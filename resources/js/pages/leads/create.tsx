@@ -4,11 +4,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Save, ArrowLeft } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Save, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -39,6 +44,9 @@ interface PageProps {
 export default function CreateLead() {
     const { sumberLeads, tipeKarpets, cabangs, config } = usePage<PageProps>().props;
     
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const [isDateOpen, setIsDateOpen] = useState(false);
+    
     const { data, setData, post, processing, errors, reset } = useForm({
         tanggal_leads: new Date().toISOString().split('T')[0],
         sapaan: 'Bapak',
@@ -58,7 +66,8 @@ export default function CreateLead() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post('/leads', {
+        
+        post('/leads', data, {
             onSuccess: () => reset(),
         });
     };
@@ -97,6 +106,35 @@ export default function CreateLead() {
         return value;
     };
 
+    const formatCurrency = (value: string) => {
+        // Remove non-numeric characters
+        const numbers = value.replace(/\D/g, '');
+        
+        // Format with thousands separator
+        if (numbers) {
+            return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+        return '';
+    };
+
+    const handleCurrencyChange = (value: string) => {
+        const formatted = formatCurrency(value);
+        setData('potensi_nilai', formatted);
+    };
+
+    const getCurrencyValue = () => {
+        // Remove dots for submission
+        return data.potensi_nilai.replace(/\./g, '');
+    };
+
+    const handleDateSelect = (date: Date | undefined) => {
+        if (date) {
+            setSelectedDate(date);
+            setData('tanggal_leads', date.toISOString().split('T')[0]);
+            setIsDateOpen(false);
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tambah Lead - Leads Aladdin" />
@@ -123,13 +161,30 @@ export default function CreateLead() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <Label htmlFor="tanggal_leads">Tanggal Lead *</Label>
-                                    <Input
-                                        id="tanggal_leads"
-                                        type="date"
-                                        value={data.tanggal_leads}
-                                        onChange={(e) => setData('tanggal_leads', e.target.value)}
-                                        className={errors.tanggal_leads ? 'border-red-500' : ''}
-                                    />
+                                    <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !selectedDate && "text-muted-foreground",
+                                                    errors.tanggal_leads && "border-red-500"
+                                                )}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {selectedDate ? format(selectedDate, "dd MMMM yyyy", { locale: id }) : "Pilih tanggal"}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={selectedDate}
+                                                onSelect={handleDateSelect}
+                                                initialFocus
+                                                locale={id}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                     {errors.tanggal_leads && (
                                         <p className="text-sm text-red-500 mt-1">{errors.tanggal_leads}</p>
                                     )}
@@ -335,14 +390,21 @@ export default function CreateLead() {
 
                             <div>
                                 <Label htmlFor="potensi_nilai">Potensi Nilai (Rupiah)</Label>
-                                <Input
-                                    id="potensi_nilai"
-                                    type="number"
-                                    value={data.potensi_nilai}
-                                    onChange={(e) => setData('potensi_nilai', e.target.value)}
-                                    placeholder="Masukkan estimasi nilai transaksi"
-                                    className={errors.potensi_nilai ? 'border-red-500' : ''}
-                                />
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">Rp</span>
+                                    <Input
+                                        id="potensi_nilai"
+                                        type="text"
+                                        value={data.potensi_nilai}
+                                        onChange={(e) => handleCurrencyChange(e.target.value)}
+                                        placeholder="0"
+                                        className={cn(
+                                            "pl-10",
+                                            errors.potensi_nilai ? 'border-red-500' : ''
+                                        )}
+                                    />
+                                </div>
+                               
                                 {errors.potensi_nilai && (
                                     <p className="text-sm text-red-500 mt-1">{errors.potensi_nilai}</p>
                                 )}

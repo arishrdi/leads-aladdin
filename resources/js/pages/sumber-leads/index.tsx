@@ -1,10 +1,21 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Database, Eye, Edit, Trash2, Plus, FileText, Activity } from 'lucide-react';
+import { Database, Eye, Edit, Trash2, Plus, FileText, Activity, Grid, List, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -28,11 +39,10 @@ interface PageProps {
 
 export default function SumberLeadsIndex() {
     const { sumberLeads } = usePage<PageProps>().props;
+    const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
     const handleDelete = (sumberLead: SumberLeads) => {
-        if (confirm(`Apakah Anda yakin ingin menghapus sumber leads "${sumberLead.nama}"?`)) {
-            router.delete(`/sumber-leads/${sumberLead.id}`);
-        }
+        router.delete(`/sumber-leads/${sumberLead.id}`);
     };
 
     const activeSumberLeads = sumberLeads.filter(s => s.is_active);
@@ -51,12 +61,33 @@ export default function SumberLeadsIndex() {
                             Kelola sumber-sumber dimana leads berasal
                         </p>
                     </div>
-                    <Link href="/sumber-leads/create">
-                        <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
-                            <Plus className="h-4 w-4 mr-2" />
-                            Tambah Sumber Leads
-                        </Button>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        {/* View Toggle */}
+                        <div className="flex border rounded-lg">
+                            <Button
+                                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('grid')}
+                                className="border-0 rounded-r-none"
+                            >
+                                <Grid className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('table')}
+                                className="border-0 rounded-l-none"
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <Link href="/sumber-leads/create">
+                            <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah Sumber Leads
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stats Overview */}
@@ -114,83 +145,216 @@ export default function SumberLeadsIndex() {
                 </div>
 
                 {/* Sumber Leads List */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {sumberLeads.map((sumberLead) => (
-                        <Card key={sumberLead.id} className="hover:shadow-md transition-shadow">
-                            <CardHeader className="pb-3">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                            <Database className="h-5 w-5 text-[#2B5235]" />
+                {viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {sumberLeads.map((sumberLead) => (
+                            <Card key={sumberLead.id} className="hover:shadow-md transition-shadow">
+                                <CardHeader className="pb-3">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-[#2B5235]/10 rounded-lg">
+                                                <Database className="h-5 w-5 text-[#2B5235]" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-lg text-[#2B5235]">
+                                                    {sumberLead.nama}
+                                                </CardTitle>
+                                                <p className="text-sm text-gray-600">
+                                                    ID: {sumberLead.id}
+                                                </p>
+                                            </div>
                                         </div>
+                                        <Badge variant={sumberLead.is_active ? 'default' : 'secondary'}>
+                                            {sumberLead.is_active ? 'Aktif' : 'Nonaktif'}
+                                        </Badge>
+                                    </div>
+                                </CardHeader>
+                                
+                                <CardContent className="space-y-4">
+                                    {/* Description */}
+                                    {sumberLead.deskripsi && (
                                         <div>
-                                            <CardTitle className="text-lg text-[#2B5235]">
-                                                {sumberLead.nama}
-                                            </CardTitle>
-                                            <p className="text-sm text-gray-600">
-                                                ID: {sumberLead.id}
+                                            <p className="text-sm text-gray-600 mb-1">Deskripsi:</p>
+                                            <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded">
+                                                {sumberLead.deskripsi}
                                             </p>
                                         </div>
-                                    </div>
-                                    <Badge variant={sumberLead.is_active ? 'default' : 'secondary'}>
-                                        {sumberLead.is_active ? 'Aktif' : 'Nonaktif'}
-                                    </Badge>
-                                </div>
-                            </CardHeader>
-                            
-                            <CardContent className="space-y-4">
-                                {/* Description */}
-                                {sumberLead.deskripsi && (
-                                    <div>
-                                        <p className="text-sm text-gray-600 mb-1">Deskripsi:</p>
-                                        <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded">
-                                            {sumberLead.deskripsi}
-                                        </p>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Stats */}
-                                <div className="grid grid-cols-2 gap-4 py-3 border-t border-gray-100">
-                                    <div className="text-center">
-                                        <div className="text-lg font-bold text-[#2B5235]">
-                                            {sumberLead.leads_count || 0}
+                                    {/* Stats */}
+                                    <div className="grid grid-cols-2 gap-4 py-3 border-t border-gray-100">
+                                        <div className="text-center">
+                                            <div className="text-lg font-bold text-[#2B5235]">
+                                                {sumberLead.leads_count || 0}
+                                            </div>
+                                            <div className="text-xs text-gray-500">Total Leads</div>
                                         </div>
-                                        <div className="text-xs text-gray-500">Total Leads</div>
+                                        <div className="text-center">
+                                            <div className="text-lg font-bold text-blue-600">
+                                                {new Date(sumberLead.created_at).toLocaleDateString('id-ID')}
+                                            </div>
+                                            <div className="text-xs text-gray-500">Dibuat</div>
+                                        </div>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="text-lg font-bold text-blue-600">
+
+                                    {/* Last Updated */}
+                                    <div className="text-xs text-gray-500">
+                                        Terakhir diperbarui: {new Date(sumberLead.updated_at).toLocaleString('id-ID')}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex gap-2 pt-3 border-t border-gray-100">
+                                        <Link href={`/sumber-leads/${sumberLead.id}/edit`} className="flex-1">
+                                            <Button variant="outline" size="sm" className="w-full">
+                                                <Edit className="h-4 w-4 mr-2" />
+                                                Edit
+                                            </Button>
+                                        </Link>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm"
+                                                    className="text-red-600 hover:text-red-700 hover:border-red-300"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle className="flex items-center gap-2 text-red-600">
+                                                        <AlertTriangle className="h-5 w-5" />
+                                                        Konfirmasi Hapus Sumber Leads
+                                                    </DialogTitle>
+                                                    <DialogDescription>
+                                                        Apakah Anda yakin ingin menghapus sumber leads <strong>"{sumberLead.nama}"</strong>?
+                                                        <br />
+                                                        Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait sumber leads ini.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <DialogFooter className="gap-2">
+                                                    <DialogTrigger asChild>
+                                                        <Button variant="outline">
+                                                            Batal
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <Button 
+                                                        variant="destructive"
+                                                        onClick={() => handleDelete(sumberLead)}
+                                                    >
+                                                        Ya, Hapus Sumber Leads
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                ) : (
+                    <Card>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Sumber Leads</TableHead>
+                                    <TableHead>Deskripsi</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Total Leads</TableHead>
+                                    <TableHead>Dibuat</TableHead>
+                                    <TableHead>Diperbarui</TableHead>
+                                    <TableHead>Aksi</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {sumberLeads.map((sumberLead) => (
+                                    <TableRow key={sumberLead.id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-[#2B5235]/10 rounded-lg">
+                                                    <Database className="h-4 w-4 text-[#2B5235]" />
+                                                </div>
+                                                <div>
+                                                    <span className="font-medium">{sumberLead.nama}</span>
+                                                    <p className="text-sm text-gray-600">ID: {sumberLead.id}</p>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="max-w-xs">
+                                            <span className="text-sm text-gray-600 truncate block">
+                                                {sumberLead.deskripsi || '-'}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={sumberLead.is_active ? 'default' : 'secondary'}>
+                                                {sumberLead.is_active ? 'Aktif' : 'Nonaktif'}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="text-center">
+                                                <div className="text-lg font-bold text-[#2B5235]">
+                                                    {sumberLead.leads_count || 0}
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-gray-600">
                                             {new Date(sumberLead.created_at).toLocaleDateString('id-ID')}
-                                        </div>
-                                        <div className="text-xs text-gray-500">Dibuat</div>
-                                    </div>
-                                </div>
-
-                                {/* Last Updated */}
-                                <div className="text-xs text-gray-500">
-                                    Terakhir diperbarui: {new Date(sumberLead.updated_at).toLocaleString('id-ID')}
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex gap-2 pt-3 border-t border-gray-100">
-                                    <Link href={`/sumber-leads/${sumberLead.id}/edit`} className="flex-1">
-                                        <Button variant="outline" size="sm" className="w-full">
-                                            <Edit className="h-4 w-4 mr-2" />
-                                            Edit
-                                        </Button>
-                                    </Link>
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm"
-                                        onClick={() => handleDelete(sumberLead)}
-                                        className="text-red-600 hover:text-red-700 hover:border-red-300"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                                        </TableCell>
+                                        <TableCell className="text-gray-600">
+                                            {new Date(sumberLead.updated_at).toLocaleDateString('id-ID')}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex gap-1">
+                                                <Link href={`/sumber-leads/${sumberLead.id}/edit`}>
+                                                    <Button variant="outline" size="sm">
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                </Link>
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button 
+                                                            variant="outline" 
+                                                            size="sm"
+                                                            className="text-red-600 hover:text-red-700 hover:border-red-300"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent>
+                                                        <DialogHeader>
+                                                            <DialogTitle className="flex items-center gap-2 text-red-600">
+                                                                <AlertTriangle className="h-5 w-5" />
+                                                                Konfirmasi Hapus Sumber Leads
+                                                            </DialogTitle>
+                                                            <DialogDescription>
+                                                                Apakah Anda yakin ingin menghapus sumber leads <strong>"{sumberLead.nama}"</strong>?
+                                                                <br />
+                                                                Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait sumber leads ini.
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+                                                        <DialogFooter className="gap-2">
+                                                            <DialogTrigger asChild>
+                                                                <Button variant="outline">
+                                                                    Batal
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <Button 
+                                                                variant="destructive"
+                                                                onClick={() => handleDelete(sumberLead)}
+                                                            >
+                                                                Ya, Hapus Sumber Leads
+                                                            </Button>
+                                                        </DialogFooter>
+                                                    </DialogContent>
+                                                </Dialog>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Card>
+                )}
 
                 {sumberLeads.length === 0 && (
                     <Card>

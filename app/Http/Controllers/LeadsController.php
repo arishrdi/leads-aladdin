@@ -90,6 +90,12 @@ class LeadsController extends Controller
     {
         $this->authorize('create', Leads::class);
 
+        // Clean formatted currency before validation
+        if ($request->filled('potensi_nilai')) {
+            $cleanValue = (float) str_replace('.', '', $request->input('potensi_nilai'));
+            $request->merge(['potensi_nilai' => $cleanValue]);
+        }
+        
         $validated = $request->validate([
             'tanggal_leads' => 'required|date',
             'sapaan' => 'required|in:Bapak,Ibu',
@@ -98,6 +104,7 @@ class LeadsController extends Controller
             'nama_masjid_instansi' => 'nullable|string|max:255',
             'sumber_leads_id' => 'required|exists:sumber_leads,id',
             'catatan' => 'nullable|string',
+            'alamat' => 'nullable|string',
             'prioritas' => 'required|in:fasttrack,normal,rendah',
             'kebutuhan_karpet' => 'nullable|string|max:255',
             'potensi_nilai' => 'nullable|numeric|min:0',
@@ -161,6 +168,12 @@ class LeadsController extends Controller
     {
         $this->authorize('update', $lead);
 
+        // Clean formatted currency before validation
+        if ($request->filled('potensi_nilai')) {
+            $cleanValue = (float) str_replace('.', '', $request->input('potensi_nilai'));
+            $request->merge(['potensi_nilai' => $cleanValue]);
+        }
+        
         $validated = $request->validate([
             'tanggal_leads' => 'required|date',
             'sapaan' => 'required|in:Bapak,Ibu',
@@ -169,6 +182,7 @@ class LeadsController extends Controller
             'nama_masjid_instansi' => 'nullable|string|max:255',
             'sumber_leads_id' => 'required|exists:sumber_leads,id',
             'catatan' => 'nullable|string',
+            'alamat' => 'nullable|string',
             'alasan_closing' => 'nullable|string',
             'alasan_tidak_closing' => 'nullable|string',
             'prioritas' => 'required|in:fasttrack,normal,rendah',

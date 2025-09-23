@@ -1,10 +1,21 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Package, Eye, Edit, Trash2, Plus, FileText, Activity } from 'lucide-react';
+import { Package, Eye, Edit, Trash2, Plus, FileText, Activity, Grid, List, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -28,11 +39,10 @@ interface PageProps {
 
 export default function TipeKarpetsIndex() {
     const { tipeKarpets } = usePage<PageProps>().props;
+    const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
     const handleDelete = (tipeKarpet: TipeKarpet) => {
-        if (confirm(`Apakah Anda yakin ingin menghapus tipe karpet "${tipeKarpet.nama}"?`)) {
-            router.delete(`/tipe-karpets/${tipeKarpet.id}`);
-        }
+        router.delete(`/tipe-karpets/${tipeKarpet.id}`);
     };
 
     const activeTipeKarpets = tipeKarpets.filter(t => t.is_active);
@@ -51,12 +61,33 @@ export default function TipeKarpetsIndex() {
                             Kelola jenis-jenis karpet yang tersedia
                         </p>
                     </div>
-                    <Link href="/tipe-karpets/create">
-                        <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
-                            <Plus className="h-4 w-4 mr-2" />
-                            Tambah Tipe Karpet
-                        </Button>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        {/* View Toggle */}
+                        <div className="flex border rounded-lg">
+                            <Button
+                                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('grid')}
+                                className="border-0 rounded-r-none"
+                            >
+                                <Grid className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('table')}
+                                className="border-0 rounded-l-none"
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <Link href="/tipe-karpets/create">
+                            <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah Tipe Karpet
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stats Overview */}
@@ -114,83 +145,216 @@ export default function TipeKarpetsIndex() {
                 </div>
 
                 {/* Tipe Karpets List */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {tipeKarpets.map((tipeKarpet) => (
-                        <Card key={tipeKarpet.id} className="hover:shadow-md transition-shadow">
-                            <CardHeader className="pb-3">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                            <Package className="h-5 w-5 text-[#2B5235]" />
+                {viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {tipeKarpets.map((tipeKarpet) => (
+                            <Card key={tipeKarpet.id} className="hover:shadow-md transition-shadow">
+                                <CardHeader className="pb-3">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-[#2B5235]/10 rounded-lg">
+                                                <Package className="h-5 w-5 text-[#2B5235]" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-lg text-[#2B5235]">
+                                                    {tipeKarpet.nama}
+                                                </CardTitle>
+                                                <p className="text-sm text-gray-600">
+                                                    ID: {tipeKarpet.id}
+                                                </p>
+                                            </div>
                                         </div>
+                                        <Badge variant={tipeKarpet.is_active ? 'default' : 'secondary'}>
+                                            {tipeKarpet.is_active ? 'Aktif' : 'Nonaktif'}
+                                        </Badge>
+                                    </div>
+                                </CardHeader>
+                                
+                                <CardContent className="space-y-4">
+                                    {/* Description */}
+                                    {tipeKarpet.deskripsi && (
                                         <div>
-                                            <CardTitle className="text-lg text-[#2B5235]">
-                                                {tipeKarpet.nama}
-                                            </CardTitle>
-                                            <p className="text-sm text-gray-600">
-                                                ID: {tipeKarpet.id}
+                                            <p className="text-sm text-gray-600 mb-1">Deskripsi:</p>
+                                            <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded">
+                                                {tipeKarpet.deskripsi}
                                             </p>
                                         </div>
-                                    </div>
-                                    <Badge variant={tipeKarpet.is_active ? 'default' : 'secondary'}>
-                                        {tipeKarpet.is_active ? 'Aktif' : 'Nonaktif'}
-                                    </Badge>
-                                </div>
-                            </CardHeader>
-                            
-                            <CardContent className="space-y-4">
-                                {/* Description */}
-                                {tipeKarpet.deskripsi && (
-                                    <div>
-                                        <p className="text-sm text-gray-600 mb-1">Deskripsi:</p>
-                                        <p className="text-sm text-gray-800 bg-gray-50 p-2 rounded">
-                                            {tipeKarpet.deskripsi}
-                                        </p>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Stats */}
-                                <div className="grid grid-cols-2 gap-4 py-3 border-t border-gray-100">
-                                    <div className="text-center">
-                                        <div className="text-lg font-bold text-[#2B5235]">
-                                            {tipeKarpet.leads_count || 0}
+                                    {/* Stats */}
+                                    <div className="grid grid-cols-2 gap-4 py-3 border-t border-gray-100">
+                                        <div className="text-center">
+                                            <div className="text-lg font-bold text-[#2B5235]">
+                                                {tipeKarpet.leads_count || 0}
+                                            </div>
+                                            <div className="text-xs text-gray-500">Total Leads</div>
                                         </div>
-                                        <div className="text-xs text-gray-500">Total Leads</div>
+                                        <div className="text-center">
+                                            <div className="text-lg font-bold text-blue-600">
+                                                {new Date(tipeKarpet.created_at).toLocaleDateString('id-ID')}
+                                            </div>
+                                            <div className="text-xs text-gray-500">Dibuat</div>
+                                        </div>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="text-lg font-bold text-blue-600">
+
+                                    {/* Last Updated */}
+                                    <div className="text-xs text-gray-500">
+                                        Terakhir diperbarui: {new Date(tipeKarpet.updated_at).toLocaleString('id-ID')}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex gap-2 pt-3 border-t border-gray-100">
+                                        <Link href={`/tipe-karpets/${tipeKarpet.id}/edit`} className="flex-1">
+                                            <Button variant="outline" size="sm" className="w-full">
+                                                <Edit className="h-4 w-4 mr-2" />
+                                                Edit
+                                            </Button>
+                                        </Link>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm"
+                                                    className="text-red-600 hover:text-red-700 hover:border-red-300"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle className="flex items-center gap-2 text-red-600">
+                                                        <AlertTriangle className="h-5 w-5" />
+                                                        Konfirmasi Hapus Tipe Karpet
+                                                    </DialogTitle>
+                                                    <DialogDescription>
+                                                        Apakah Anda yakin ingin menghapus tipe karpet <strong>"{tipeKarpet.nama}"</strong>?
+                                                        <br />
+                                                        Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait tipe karpet ini.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <DialogFooter className="gap-2">
+                                                    <DialogTrigger asChild>
+                                                        <Button variant="outline">
+                                                            Batal
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <Button 
+                                                        variant="destructive"
+                                                        onClick={() => handleDelete(tipeKarpet)}
+                                                    >
+                                                        Ya, Hapus Tipe Karpet
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                ) : (
+                    <Card>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Tipe Karpet</TableHead>
+                                    <TableHead>Deskripsi</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Total Leads</TableHead>
+                                    <TableHead>Dibuat</TableHead>
+                                    <TableHead>Diperbarui</TableHead>
+                                    <TableHead>Aksi</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {tipeKarpets.map((tipeKarpet) => (
+                                    <TableRow key={tipeKarpet.id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-[#2B5235]/10 rounded-lg">
+                                                    <Package className="h-4 w-4 text-[#2B5235]" />
+                                                </div>
+                                                <div>
+                                                    <span className="font-medium">{tipeKarpet.nama}</span>
+                                                    <p className="text-sm text-gray-600">ID: {tipeKarpet.id}</p>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="max-w-xs">
+                                            <span className="text-sm text-gray-600 truncate block">
+                                                {tipeKarpet.deskripsi || '-'}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={tipeKarpet.is_active ? 'default' : 'secondary'}>
+                                                {tipeKarpet.is_active ? 'Aktif' : 'Nonaktif'}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="text-center">
+                                                <div className="text-lg font-bold text-[#2B5235]">
+                                                    {tipeKarpet.leads_count || 0}
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-gray-600">
                                             {new Date(tipeKarpet.created_at).toLocaleDateString('id-ID')}
-                                        </div>
-                                        <div className="text-xs text-gray-500">Dibuat</div>
-                                    </div>
-                                </div>
-
-                                {/* Last Updated */}
-                                <div className="text-xs text-gray-500">
-                                    Terakhir diperbarui: {new Date(tipeKarpet.updated_at).toLocaleString('id-ID')}
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex gap-2 pt-3 border-t border-gray-100">
-                                    <Link href={`/tipe-karpets/${tipeKarpet.id}/edit`} className="flex-1">
-                                        <Button variant="outline" size="sm" className="w-full">
-                                            <Edit className="h-4 w-4 mr-2" />
-                                            Edit
-                                        </Button>
-                                    </Link>
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm"
-                                        onClick={() => handleDelete(tipeKarpet)}
-                                        className="text-red-600 hover:text-red-700 hover:border-red-300"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                                        </TableCell>
+                                        <TableCell className="text-gray-600">
+                                            {new Date(tipeKarpet.updated_at).toLocaleDateString('id-ID')}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex gap-1">
+                                                <Link href={`/tipe-karpets/${tipeKarpet.id}/edit`}>
+                                                    <Button variant="outline" size="sm">
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                </Link>
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button 
+                                                            variant="outline" 
+                                                            size="sm"
+                                                            className="text-red-600 hover:text-red-700 hover:border-red-300"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent>
+                                                        <DialogHeader>
+                                                            <DialogTitle className="flex items-center gap-2 text-red-600">
+                                                                <AlertTriangle className="h-5 w-5" />
+                                                                Konfirmasi Hapus Tipe Karpet
+                                                            </DialogTitle>
+                                                            <DialogDescription>
+                                                                Apakah Anda yakin ingin menghapus tipe karpet <strong>"{tipeKarpet.nama}"</strong>?
+                                                                <br />
+                                                                Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait tipe karpet ini.
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+                                                        <DialogFooter className="gap-2">
+                                                            <DialogTrigger asChild>
+                                                                <Button variant="outline">
+                                                                    Batal
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <Button 
+                                                                variant="destructive"
+                                                                onClick={() => handleDelete(tipeKarpet)}
+                                                            >
+                                                                Ya, Hapus Tipe Karpet
+                                                            </Button>
+                                                        </DialogFooter>
+                                                    </DialogContent>
+                                                </Dialog>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Card>
+                )}
 
                 {tipeKarpets.length === 0 && (
                     <Card>

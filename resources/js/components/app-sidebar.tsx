@@ -60,11 +60,11 @@ const getMainNavItems = (user: User): NavItem[] => {
                 href: '/reports',
                 icon: BarChart3,
             },
-            {
-                title: 'Settings',
-                href: '/settings',
-                icon: Settings,
-            }
+            // {
+            //     title: 'Settings',
+            //     href: '/settings',
+            //     icon: Settings,
+            // }
         );
     }
 
