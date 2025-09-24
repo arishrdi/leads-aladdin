@@ -139,7 +139,7 @@ export default function CreateLead() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tambah Lead - Leads Aladdin" />
             
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className=" space-y-6">
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="sm" onClick={() => window.history.back()}>
