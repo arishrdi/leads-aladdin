@@ -117,7 +117,7 @@ class LeadManagementService
      */
     public function getNextStage(string $currentStage): ?string
     {
-        $stageProgression = config('leads.follow_up.auto_scheduling.stage_progression', []);
+        $stageProgression = \App\Models\FollowUpStage::getStageProgression();
         return $stageProgression[$currentStage] ?? null;
     }
 

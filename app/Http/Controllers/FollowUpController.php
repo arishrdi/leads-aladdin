@@ -68,7 +68,7 @@ class FollowUpController extends Controller
                 'end_date' => $endDate,
             ],
             'config' => [
-                'followUpStages' => config('leads.follow_up_stages'),
+                'followUpStages' => \App\Models\FollowUpStage::getActiveStages(),
             ],
         ]);
     }
@@ -196,7 +196,7 @@ class FollowUpController extends Controller
         return Inertia::render('follow-ups/create', [
             'lead' => $lead->load(['user', 'cabang']),
             'config' => [
-                'followUpStages' => config('leads.follow_up_stages'),
+                'followUpStages' => \App\Models\FollowUpStage::getActiveStages(),
             ],
         ]);
     }
@@ -235,7 +235,7 @@ class FollowUpController extends Controller
         return Inertia::render('follow-ups/show', [
             'followUp' => $followUp,
             'config' => [
-                'followUpStages' => config('leads.follow_up_stages'),
+                'followUpStages' => \App\Models\FollowUpStage::getActiveStages(),
                 'alasanClosing' => config('leads.alasan_closing'),
                 'alasanTidakClosing' => config('leads.alasan_tidak_closing'),
             ],
@@ -346,7 +346,7 @@ class FollowUpController extends Controller
             'leads' => $leads,
             'followUps' => $followUps,
             'config' => [
-                'followUpStages' => config('leads.follow_up_stages'),
+                'followUpStages' => \App\Models\FollowUpStage::getActiveStages(),
             ],
         ]);
     }

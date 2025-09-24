@@ -4,6 +4,7 @@ use App\Http\Controllers\CabangController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\FollowUpStageController;
 use App\Http\Controllers\LeadsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SumberLeadsController;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    // return Inertia::render('welcome');
     return to_route('login');
 })->name('home');
 
@@ -55,6 +55,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('sumber-leads', SumberLeadsController::class);
     Route::resource('tipe-karpets', TipeKarpetController::class);
+    Route::resource('follow-up-stages', FollowUpStageController::class);
+    Route::patch('follow-up-stages-order', [FollowUpStageController::class, 'updateOrder'])->name('follow-up-stages.update-order');
 });
 
 require __DIR__.'/settings.php';

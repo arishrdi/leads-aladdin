@@ -58,6 +58,11 @@ class FollowUp extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function followUpStage(): BelongsTo
+    {
+        return $this->belongsTo(FollowUpStage::class, 'stage', 'key');
+    }
+
     public function isScheduled(): bool
     {
         return $this->status === 'scheduled';

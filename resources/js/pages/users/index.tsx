@@ -69,7 +69,7 @@ const getRoleDisplayName = (role: string) => {
 
 export default function UsersIndex() {
     const { users } = usePage<PageProps>().props;
-    const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [userToDelete, setUserToDelete] = useState<UserData | null>(null);
 
     const handleDelete = (user: UserData) => {
@@ -87,40 +87,38 @@ export default function UsersIndex() {
             <Head title="Kelola User - Leads Aladdin" />
             
             <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
+                <div className="flex gap-4 lg:gap-0 lg:items-center justify-start lg:justify-between lg:flex-row flex-col">
+                    <div className='w-full'>
                         <h1 className="text-2xl font-bold text-[#2B5235]">Kelola User</h1>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 mt-1">
                             Kelola pengguna sistem dan hak akses di seluruh cabang
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                        {/* View Toggle */}
+                    <div className="flex items-center gap-3 w-full justify-between lg:justify-end">
                         <div className="flex border rounded-lg">
+                            <Button
+                                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('list')}
+                                className="rounded-r-none"
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
                             <Button
                                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                                 size="sm"
                                 onClick={() => setViewMode('grid')}
-                                className="border-0 rounded-r-none"
+                                className="rounded-l-none"
                             >
                                 <Grid className="h-4 w-4" />
                             </Button>
-                            <Button
-                                variant={viewMode === 'table' ? 'default' : 'ghost'}
-                                size="sm"
-                                onClick={() => setViewMode('table')}
-                                className="border-0 rounded-l-none"
-                            >
-                                <List className="h-4 w-4" />
-                            </Button>
                         </div>
-                        <Link href="/users/create">
-                            <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
+                        <Button asChild>
+                            <Link href="/users/create">
                                 <Plus className="h-4 w-4 mr-2" />
                                 Tambah User
-                            </Button>
-                        </Link>
+                            </Link>
+                        </Button>
                     </div>
                 </div>
 
@@ -192,7 +190,120 @@ export default function UsersIndex() {
                 </div>
 
                 {/* Users List */}
-                {viewMode === 'grid' ? (
+                {viewMode === 'list' ? (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Daftar User</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>User</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>Role</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Cabang</TableHead>
+                                        <TableHead>Bergabung</TableHead>
+                                        <TableHead>Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {users.map((user) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-[#2B5235]/10 rounded-lg">
+                                                        <User className="h-4 w-4 text-[#2B5235]" />
+                                                    </div>
+                                                    <span className="font-medium">{user.name}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-gray-600">{user.email}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={getRoleBadgeVariant(user.role)}>
+                                                    {getRoleDisplayName(user.role)}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col gap-1">
+                                                    <Badge variant={user.is_active ? 'default' : 'secondary'} className="text-xs">
+                                                        {user.is_active ? 'Aktif' : 'Nonaktif'}
+                                                    </Badge>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.cabangs.slice(0, 2).map((cabang) => (
+                                                        <Badge key={cabang.id} variant="outline" className="text-xs">
+                                                            {cabang.nama_cabang}
+                                                        </Badge>
+                                                    ))}
+                                                    {user.cabangs.length > 2 && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            +{user.cabangs.length - 2} lainnya
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-gray-600">
+                                                {new Date(user.created_at).toLocaleDateString('id-ID')}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Button variant="ghost" size="sm" asChild>
+                                                        <Link href={`/users/${user.id}`}>
+                                                            <Eye className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                    <Button variant="ghost" size="sm" asChild>
+                                                        <Link href={`/users/${user.id}/edit`}>
+                                                            <Edit className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Button 
+                                                                variant="ghost" 
+                                                                size="sm"
+                                                                className="text-red-600 hover:text-red-700"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        <DialogContent>
+                                                            <DialogHeader>
+                                                                <DialogTitle className="flex items-center gap-2">
+                                                                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                                                                    Konfirmasi Hapus User
+                                                                </DialogTitle>
+                                                                <DialogDescription>
+                                                                    Apakah Anda yakin ingin menghapus user "{user.name}"?
+                                                                    <br />
+                                                                    Tindakan ini tidak dapat dibatalkan.
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                            <DialogFooter>
+                                                                <DialogTrigger asChild>
+                                                                    <Button variant="outline">
+                                                                        Batal
+                                                                    </Button>
+                                                                </DialogTrigger>
+                                                                <Button variant="destructive" onClick={() => handleDelete(user)}>
+                                                                    Ya, Hapus
+                                                                </Button>
+                                                            </DialogFooter>
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {users.map((user) => (
                             <Card key={user.id} className="hover:shadow-md transition-shadow">
@@ -260,52 +371,47 @@ export default function UsersIndex() {
                                     )}
 
                                     {/* Actions */}
-                                    <div className="flex gap-2 pt-3 border-t border-gray-100">
-                                        <Link href={`/users/${user.id}`} className="flex-1">
-                                            <Button variant="outline" size="sm" className="w-full">
-                                                <Eye className="h-4 w-4 mr-2" />
-                                                Detail
-                                            </Button>
-                                        </Link>
-                                        <Link href={`/users/${user.id}/edit`} className="flex-1">
-                                            <Button variant="outline" size="sm" className="w-full">
-                                                <Edit className="h-4 w-4 mr-2" />
-                                                Edit
-                                            </Button>
-                                        </Link>
+                                    <div className="flex justify-end gap-2 pt-2">
+                                        <Button variant="ghost" size="sm" asChild>
+                                            <Link href={`/users/${user.id}`}>
+                                                <Eye className="h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                        <Button variant="ghost" size="sm" asChild>
+                                            <Link href={`/users/${user.id}/edit`}>
+                                                <Edit className="h-4 w-4" />
+                                            </Link>
+                                        </Button>
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button 
-                                                    variant="outline" 
+                                                    variant="ghost" 
                                                     size="sm"
-                                                    className="text-red-600 hover:text-red-700 hover:border-red-300"
+                                                    className="text-red-600 hover:text-red-700"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </DialogTrigger>
                                             <DialogContent>
                                                 <DialogHeader>
-                                                    <DialogTitle className="flex items-center gap-2 text-red-600">
-                                                        <AlertTriangle className="h-5 w-5" />
+                                                    <DialogTitle className="flex items-center gap-2">
+                                                        <AlertTriangle className="h-5 w-5 text-red-500" />
                                                         Konfirmasi Hapus User
                                                     </DialogTitle>
                                                     <DialogDescription>
-                                                        Apakah Anda yakin ingin menghapus user <strong>{user.name}</strong>?
+                                                        Apakah Anda yakin ingin menghapus user "{user.name}"?
                                                         <br />
-                                                        Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait user ini.
+                                                        Tindakan ini tidak dapat dibatalkan.
                                                     </DialogDescription>
                                                 </DialogHeader>
-                                                <DialogFooter className="gap-2">
+                                                <DialogFooter>
                                                     <DialogTrigger asChild>
                                                         <Button variant="outline">
                                                             Batal
                                                         </Button>
                                                     </DialogTrigger>
-                                                    <Button 
-                                                        variant="destructive"
-                                                        onClick={() => handleDelete(user)}
-                                                    >
-                                                        Ya, Hapus User
+                                                    <Button variant="destructive" onClick={() => handleDelete(user)}>
+                                                        Ya, Hapus
                                                     </Button>
                                                 </DialogFooter>
                                             </DialogContent>
@@ -315,120 +421,6 @@ export default function UsersIndex() {
                             </Card>
                         ))}
                     </div>
-                ) : (
-                    <Card>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>User</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Cabang</TableHead>
-                                    <TableHead>Bergabung</TableHead>
-                                    <TableHead>Aksi</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {users.map((user) => (
-                                    <TableRow key={user.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                                    <User className="h-4 w-4 text-[#2B5235]" />
-                                                </div>
-                                                <span className="font-medium">{user.name}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-gray-600">{user.email}</TableCell>
-                                        <TableCell>
-                                            <Badge variant={getRoleBadgeVariant(user.role)}>
-                                                {getRoleDisplayName(user.role)}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col gap-1">
-                                                <Badge variant={user.is_active ? 'default' : 'secondary'} className="text-xs">
-                                                    {user.is_active ? 'Aktif' : 'Nonaktif'}
-                                                </Badge>
-                                                {/* <Badge variant={user.email_verified_at ? 'default' : 'secondary'} className="text-xs">
-                                                    {user.email_verified_at ? 'Email Terverifikasi' : 'Belum Verifikasi'}
-                                                </Badge> */}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-wrap gap-1">
-                                                {user.cabangs.slice(0, 2).map((cabang) => (
-                                                    <Badge key={cabang.id} variant="outline" className="text-xs">
-                                                        {cabang.nama_cabang}
-                                                    </Badge>
-                                                ))}
-                                                {user.cabangs.length > 2 && (
-                                                    <Badge variant="outline" className="text-xs">
-                                                        +{user.cabangs.length - 2} lainnya
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-gray-600">
-                                            {new Date(user.created_at).toLocaleDateString('id-ID')}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-1">
-                                                <Link href={`/users/${user.id}`}>
-                                                    <Button variant="outline" size="sm">
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                                <Link href={`/users/${user.id}/edit`}>
-                                                    <Button variant="outline" size="sm">
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                                <Dialog>
-                                                    <DialogTrigger asChild>
-                                                        <Button 
-                                                            variant="outline" 
-                                                            size="sm"
-                                                            className="text-red-600 hover:text-red-700 hover:border-red-300"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </DialogTrigger>
-                                                    <DialogContent>
-                                                        <DialogHeader>
-                                                            <DialogTitle className="flex items-center gap-2 text-red-600">
-                                                                <AlertTriangle className="h-5 w-5" />
-                                                                Konfirmasi Hapus User
-                                                            </DialogTitle>
-                                                            <DialogDescription>
-                                                                Apakah Anda yakin ingin menghapus user <strong>{user.name}</strong>?
-                                                                <br />
-                                                                Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait user ini.
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-                                                        <DialogFooter className="gap-2">
-                                                            <DialogTrigger asChild>
-                                                                <Button variant="outline">
-                                                                    Batal
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <Button 
-                                                                variant="destructive"
-                                                                onClick={() => handleDelete(user)}
-                                                            >
-                                                                Ya, Hapus User
-                                                            </Button>
-                                                        </DialogFooter>
-                                                    </DialogContent>
-                                                </Dialog>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </Card>
                 )}
 
                 {users.length === 0 && (
@@ -441,12 +433,12 @@ export default function UsersIndex() {
                             <p className="text-gray-500 mb-6">
                                 Tambahkan user pertama untuk mulai mengelola sistem leads.
                             </p>
-                            <Link href="/users/create">
-                                <Button className="bg-[#2B5235] hover:bg-[#2B5235]/90">
+                            <Button asChild>
+                                <Link href="/users/create">
                                     <Plus className="h-4 w-4 mr-2" />
                                     Tambah User Pertama
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                         </CardContent>
                     </Card>
                 )}

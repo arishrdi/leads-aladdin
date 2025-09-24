@@ -229,7 +229,7 @@ export default function Dashboard() {
 
                 {/* Branch Selector for Comparison Mode */}
                 {comparisonMode && isSuperUser && all_branches && (
-                    <Card className="border-brand-primary/20 bg-brand-primary/5">
+                    <Card className="">
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -317,10 +317,10 @@ export default function Dashboard() {
                             <CardHeader>
                                 <CardTitle className="text-brand-primary flex items-center gap-2">
                                     <BarChart3 className="h-5 w-5" />
-                                    Perbandingan Metrics Utama
+                                    Perbandingan Utama
                                 </CardTitle>
                                 <CardDescription>
-                                    Perbandingan key performance indicators antar cabang terpilih
+                                    Perbandingan performa antar cabang terpilih
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -391,7 +391,7 @@ export default function Dashboard() {
                             {/* Leads Status Comparison */}
                             <Card className="border-border/50 shadow-soft">
                                 <CardHeader>
-                                    <CardTitle className="text-brand-primary">Status Leads Comparison</CardTitle>
+                                    <CardTitle className="text-brand-primary">Perbandingan Status Leads</CardTitle>
                                     <CardDescription>Perbandingan distribusi status leads</CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -425,8 +425,8 @@ export default function Dashboard() {
                             {/* Revenue Comparison */}
                             <Card className="border-border/50 shadow-soft">
                                 <CardHeader>
-                                    <CardTitle className="text-brand-primary">Revenue Comparison</CardTitle>
-                                    <CardDescription>Perbandingan pencapaian revenue antar cabang</CardDescription>
+                                    <CardTitle className="text-brand-primary">Perbandingan Pendapatan</CardTitle>
+                                    <CardDescription>Perbandingan pencapaian pendapatan antar cabang</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">
@@ -439,7 +439,7 @@ export default function Dashboard() {
                                                     <div className="flex items-center justify-between mb-2">
                                                         <span className="font-medium text-sm">{branch.nama_cabang}</span>
                                                         <span className="text-xs font-medium text-green-600">
-                                                            {revenuePercentage.toFixed(1)}% achieved
+                                                            {revenuePercentage.toFixed(1)}% tercapai
                                                         </span>
                                                     </div>
                                                     <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
@@ -463,7 +463,7 @@ export default function Dashboard() {
                         {/* Recent Leads Comparison */}
                         <Card className="border-border/50 shadow-soft">
                             <CardHeader>
-                                <CardTitle className="text-brand-primary">Recent Leads Comparison</CardTitle>
+                                <CardTitle className="text-brand-primary">Perbandingan Leads Terbaru</CardTitle>
                                 <CardDescription>Leads terbaru dari masing-masing cabang</CardDescription>
                             </CardHeader>
                             <CardContent>

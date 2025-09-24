@@ -56,6 +56,11 @@ const getMainNavItems = (user: User): NavItem[] => {
                 icon: Database,
             },
             {
+                title: 'Tahap Follow-up',
+                href: '/follow-up-stages',
+                icon: Database,
+            },
+            {
                 title: 'Reports',
                 href: '/reports',
                 icon: BarChart3,

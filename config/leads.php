@@ -10,18 +10,7 @@ return [
         'CROSS_SELLING' => 'Testimoni dan penawaran produk lain',
     ],
 
-    'follow_up_stages' => [
-        'greeting' => 'Greeting',
-        'impresi' => 'Impresi',
-        'small_talk' => 'Small Talk',
-        'rekomendasi' => 'Rekomendasi',
-        'pengajuan_survei' => 'Pengajuan Survei',
-        'presentasi' => 'Presentasi',
-        'form_pemesanan' => 'Form Pemesanan',
-        'up_cross_selling' => 'Up / Cross Selling',
-        'invoice' => 'Invoice (Pembayaran)',
-        'konfirmasi_pemasangan' => 'Konfirmasi Pemasangan',
-    ],
+    // follow_up_stages moved to database - managed via /follow-up-stages (super_user only)
 
     'prioritas' => [
         'fasttrack' => 'Fasttrack',
@@ -63,18 +52,7 @@ return [
         'auto_scheduling' => [
             'enabled' => true,
             'first_followup_days' => 1,
-            'stage_progression' => [
-                'greeting' => 'impresi',
-                'impresi' => 'small_talk',
-                'small_talk' => 'rekomendasi',
-                'rekomendasi' => 'pengajuan_survei',
-                'pengajuan_survei' => 'presentasi',
-                'presentasi' => 'form_pemesanan',
-                'form_pemesanan' => 'up_cross_selling',
-                'up_cross_selling' => 'invoice',
-                'invoice' => 'konfirmasi_pemasangan',
-                'konfirmasi_pemasangan' => null, // Final stage
-            ],
+            // stage_progression moved to database - managed via follow_up_stages.next_stage_key
         ],
     ],
 ];

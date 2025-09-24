@@ -138,7 +138,7 @@ class LeadsController extends Controller
             'lead' => $lead,
             'config' => [
                 'statuses' => config('leads.statuses'),
-                'followUpStages' => config('leads.follow_up_stages'),
+                'followUpStages' => \App\Models\FollowUpStage::getActiveStages(),
             ],
         ]);
     }

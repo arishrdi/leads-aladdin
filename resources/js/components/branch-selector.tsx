@@ -26,7 +26,8 @@ export function BranchSelector({ className = '' }: BranchSelectorProps) {
     };
 
     const [selectedBranch, setSelectedBranch] = useState<string>(
-        activeBranch?.id?.toString() || 'all'
+        // activeBranch?.id?.toString() || 'all'
+        activeBranch?.id?.toString() || availableBranches?.[0]?.id?.toString() || 'all'
     );
 
     // Update selected branch when page props change

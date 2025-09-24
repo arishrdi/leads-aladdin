@@ -323,7 +323,7 @@ export default function FollowUpsIndex() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex flex-col sm:flex-row gap-4 items-end">
+                        <div className="flex flex-col sm:flex-row gap-4">
                             <div className="flex-1">
                                 <Label>Rentang Tanggal</Label>
                                 <DateRangePicker
@@ -580,7 +580,7 @@ export default function FollowUpsIndex() {
                         <CardHeader>
                             <CardTitle>Aksi Cepat</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-3">
+                        <CardContent className="flex flex-col space-y-3">
                             <Link href="/leads">
                                 <Button variant="outline" className="w-full justify-start">
                                     <User className="h-4 w-4 mr-2" />
