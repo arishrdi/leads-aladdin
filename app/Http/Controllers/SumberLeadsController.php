@@ -17,7 +17,9 @@ class SumberLeadsController extends Controller
     {
         $this->authorize('viewAny', SumberLeads::class);
         
-        $sumberLeads = SumberLeads::where('is_active', true)->get();
+        $sumberLeads = SumberLeads::where('is_active', true)
+            ->withCount('leads')
+            ->get();
 
         return Inertia::render('sumber-leads/index', [
             'sumberLeads' => $sumberLeads,

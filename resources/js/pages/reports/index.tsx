@@ -8,7 +8,7 @@ import { DateRangePicker } from '@/components/date-range-picker';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { BarChart3, Download, Filter, TrendingUp, Users, Target, DollarSign, Calendar, FileText, Percent } from 'lucide-react';
+import { BarChart3, Download, Filter, TrendingUp, Users, Target, DollarSign, Calendar, FileText, Percent, MapPin, UserCheck } from 'lucide-react';
 import { useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
@@ -28,10 +28,14 @@ interface Summary {
     total_revenue: number;
     average_deal: number;
     conversion_rate: number;
+    total_kunjungan: number;
+    active_kunjungan: number;
+    completed_kunjungan: number;
+    pending_kunjungan: number;
 }
 
 interface LeadSource {
-    nama_sumber: string;
+    nama: string;
     total: number;
 }
 
@@ -59,6 +63,8 @@ interface BranchPerformance {
     total_leads: number;
     converted_leads: number;
     total_revenue: number;
+    total_kunjungan: number;
+    completed_kunjungan: number;
 }
 
 interface Cabang {
@@ -277,118 +283,209 @@ export default function ReportsIndex() {
                 )}
 
                 {/* Summary Statistics */}
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="space-y-6">
+                    <div>
+                        <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Leads</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-100 rounded-lg">
+                                            <Target className="h-5 w-5 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Total Leads</p>
+                                            <p className="text-2xl font-bold text-blue-600">{summary.total_leads}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-green-100 rounded-lg">
+                                            <TrendingUp className="h-5 w-5 text-green-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Customer</p>
+                                            <p className="text-2xl font-bold text-green-600">{summary.customer_leads}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-[#DDBE75]/20 rounded-lg">
+                                            <DollarSign className="h-5 w-5 text-[#2B5235]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Total Pendapatan</p>
+                                            <p className="text-lg font-bold text-[#2B5235]">
+                                                {formatCurrency(summary.total_revenue)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-purple-100 rounded-lg">
+                                            <Percent className="h-5 w-5 text-purple-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Tingkat Konversi</p>
+                                            <p className="text-2xl font-bold text-purple-600">
+                                                {Number(summary.conversion_rate || 0).toFixed(1)}%
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-orange-100 rounded-lg">
+                                            <Calendar className="h-5 w-5 text-orange-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Rata-rata Deal</p>
+                                            <p className="text-lg font-bold text-orange-600">
+                                                {formatCurrency(summary.average_deal)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Kunjungan</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-purple-100 rounded-lg">
+                                            <MapPin className="h-5 w-5 text-purple-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Total Kunjungan</p>
+                                            <p className="text-2xl font-bold text-purple-600">{summary.total_kunjungan || 0}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-100 rounded-lg">
+                                            <Users className="h-5 w-5 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Kunjungan Aktif</p>
+                                            <p className="text-2xl font-bold text-blue-600">{summary.active_kunjungan || 0}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-green-100 rounded-lg">
+                                            <UserCheck className="h-5 w-5 text-green-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Kunjungan Selesai</p>
+                                            <p className="text-2xl font-bold text-green-600">{summary.completed_kunjungan || 0}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardContent className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-yellow-100 rounded-lg">
+                                            <Calendar className="h-5 w-5 text-yellow-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-600">Kunjungan Pending</p>
+                                            <p className="text-2xl font-bold text-yellow-600">{summary.pending_kunjungan || 0}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Lead Status Breakdown */}
                     <Card>
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <Target className="h-5 w-5 text-blue-600" />
+                        <CardHeader>
+                            <CardTitle>Rincian Status Leads</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-yellow-600">{summary.warm_leads}</div>
+                                    <div className="text-sm text-yellow-800">WARM</div>
                                 </div>
-                                <div>
-                                    <p className="text-sm text-gray-600">Total Leads</p>
-                                    <p className="text-2xl font-bold text-blue-600">{summary.total_leads}</p>
+                                <div className="text-center p-3 bg-orange-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-orange-600">{summary.hot_leads}</div>
+                                    <div className="text-sm text-orange-800">HOT</div>
+                                </div>
+                                <div className="text-center p-3 bg-green-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-green-600">{summary.customer_leads}</div>
+                                    <div className="text-sm text-green-800">CUSTOMER</div>
+                                </div>
+                                <div className="text-center p-3 bg-red-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-red-600">{summary.exit_leads}</div>
+                                    <div className="text-sm text-red-800">EXIT</div>
+                                </div>
+                                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-gray-600">{summary.cold_leads}</div>
+                                    <div className="text-sm text-gray-800">COLD</div>
+                                </div>
+                                <div className="text-center p-3 bg-purple-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-purple-600">{summary.cross_selling_leads}</div>
+                                    <div className="text-sm text-purple-800">CROSS_SELLING</div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
+                    {/* Kunjungan Status Breakdown */}
                     <Card>
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-green-100 rounded-lg">
-                                    <TrendingUp className="h-5 w-5 text-green-600" />
+                        <CardHeader>
+                            <CardTitle>Rincian Status Kunjungan</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-blue-600">{summary.active_kunjungan || 0}</div>
+                                    <div className="text-sm text-blue-800">AKTIF</div>
                                 </div>
-                                <div>
-                                    <p className="text-sm text-gray-600">Customer</p>
-                                    <p className="text-2xl font-bold text-green-600">{summary.customer_leads}</p>
+                                <div className="text-center p-3 bg-green-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-green-600">{summary.completed_kunjungan || 0}</div>
+                                    <div className="text-sm text-green-800">SELESAI</div>
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-[#DDBE75]/20 rounded-lg">
-                                    <DollarSign className="h-5 w-5 text-[#2B5235]" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-600">Total Pendapatan</p>
-                                    <p className="text-lg font-bold text-[#2B5235]">
-                                        {formatCurrency(summary.total_revenue)}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-purple-100 rounded-lg">
-                                    <Percent className="h-5 w-5 text-purple-600" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-600">Tingkat Konversi</p>
-                                    <p className="text-2xl font-bold text-purple-600">
-                                        {Number(summary.conversion_rate || 0).toFixed(1)}%
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-orange-100 rounded-lg">
-                                    <Calendar className="h-5 w-5 text-orange-600" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-600">Rata-rata Deal</p>
-                                    <p className="text-lg font-bold text-orange-600">
-                                        {formatCurrency(summary.average_deal)}
-                                    </p>
+                                <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                                    <div className="text-2xl font-bold text-yellow-600">{summary.pending_kunjungan || 0}</div>
+                                    <div className="text-sm text-yellow-800">PENDING</div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
-
-                {/* Lead Status Breakdown */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Rincian Status Leads</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-                            <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                                <div className="text-2xl font-bold text-yellow-600">{summary.warm_leads}</div>
-                                <div className="text-sm text-yellow-800">WARM</div>
-                            </div>
-                            <div className="text-center p-3 bg-orange-50 rounded-lg">
-                                <div className="text-2xl font-bold text-orange-600">{summary.hot_leads}</div>
-                                <div className="text-sm text-orange-800">HOT</div>
-                            </div>
-                            <div className="text-center p-3 bg-green-50 rounded-lg">
-                                <div className="text-2xl font-bold text-green-600">{summary.customer_leads}</div>
-                                <div className="text-sm text-green-800">CUSTOMER</div>
-                            </div>
-                            <div className="text-center p-3 bg-red-50 rounded-lg">
-                                <div className="text-2xl font-bold text-red-600">{summary.exit_leads}</div>
-                                <div className="text-sm text-red-800">EXIT</div>
-                            </div>
-                            <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                <div className="text-2xl font-bold text-gray-600">{summary.cold_leads}</div>
-                                <div className="text-sm text-gray-800">COLD</div>
-                            </div>
-                            <div className="text-center p-3 bg-purple-50 rounded-lg">
-                                <div className="text-2xl font-bold text-purple-600">{summary.cross_selling_leads}</div>
-                                <div className="text-sm text-purple-800">CROSS_SELLING</div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Lead Sources */}
@@ -506,6 +603,14 @@ export default function ReportsIndex() {
                                                 <Badge variant="outline">{branch.total_leads} leads</Badge>
                                                 <Badge className="bg-green-100 text-green-800">
                                                     {branch.converted_leads} konversi
+                                                </Badge>
+                                            </div>
+                                            <div className="flex gap-2 mb-1">
+                                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                                                    {branch.total_kunjungan || 0} kunjungan
+                                                </Badge>
+                                                <Badge className="bg-blue-100 text-blue-800">
+                                                    {branch.completed_kunjungan || 0} selesai
                                                 </Badge>
                                             </div>
                                             <p className="text-sm font-medium text-[#2B5235]">

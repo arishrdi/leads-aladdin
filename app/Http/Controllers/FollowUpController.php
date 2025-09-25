@@ -226,9 +226,22 @@ class FollowUpController extends Controller
 
     public function show(FollowUp $followUp)
     {
-        if ($followUp->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak dapat melihat follow-up ini.');
+        $user = auth()->user();
+        
+        // Check access permissions based on user role
+        if ($user->role === 'marketing') {
+            // Marketing can only see their own follow-ups
+            if ($followUp->user_id !== $user->id) {
+                abort(403, 'Anda tidak dapat melihat follow-up ini.');
+            }
+        } elseif ($user->role === 'supervisor') {
+            // Supervisor can see follow-ups from their assigned branches
+            $userBranchIds = $user->cabangs()->pluck('cabangs.id')->toArray();
+            if (!in_array($followUp->leads->cabang_id, $userBranchIds)) {
+                abort(403, 'Anda tidak dapat melihat follow-up ini.');
+            }
         }
+        // Super user can see all follow-ups (no additional check needed)
 
         $followUp->load(['leads.cabang', 'user']);
 
@@ -239,6 +252,7 @@ class FollowUpController extends Controller
                 'alasanClosing' => config('leads.alasan_closing'),
                 'alasanTidakClosing' => config('leads.alasan_tidak_closing'),
             ],
+            'canEdit' => $user->role === 'marketing' && $followUp->user_id === $user->id,
         ]);
     }
 

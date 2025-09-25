@@ -68,7 +68,7 @@ const getMainNavItems = (user: User): NavItem[] => {
             {
                 title: 'Kelola Item Kunjungan',
                 href: '/kunjungan-items',
-                icon: Settings,
+                icon: Database,
             },
             {
                 title: 'Reports',

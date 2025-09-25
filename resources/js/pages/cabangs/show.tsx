@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, Edit, Building, Users, Phone, MapPin, User, Calendar, TrendingUp, Target, DollarSign } from 'lucide-react';
+import { ArrowLeft, Edit, Building, Users, Phone, MapPin, User, Calendar, TrendingUp, Target, DollarSign, MapPinIcon } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -24,8 +24,6 @@ interface Lead {
     id: number;
     nama_pelanggan: string;
     status: string;
-    budget_min: number;
-    budget_max: number;
     created_at: string;
     user: {
         id: number;
@@ -54,6 +52,10 @@ interface Stats {
     active_leads: number;
     converted_leads: number;
     total_revenue: number;
+    total_kunjungan: number;
+    active_kunjungan: number;
+    completed_kunjungan: number;
+    pending_kunjungan: number;
 }
 
 interface PageProps {
@@ -117,8 +119,10 @@ export default function ShowCabang() {
                     </Link>
                 </div>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Stats Cards - Leads */}
+                <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Leads</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
@@ -176,6 +180,69 @@ export default function ShowCabang() {
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
+                </div>
+
+                {/* Kunjungan Stats */}
+                <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Kunjungan</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <Card>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-purple-100 rounded-lg">
+                                        <MapPinIcon className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Total Kunjungan</p>
+                                        <p className="text-2xl font-bold text-purple-600">{stats.total_kunjungan || 0}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <Calendar className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Kunjungan Aktif</p>
+                                        <p className="text-2xl font-bold text-blue-600">{stats.active_kunjungan || 0}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-green-100 rounded-lg">
+                                        <Target className="h-5 w-5 text-green-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Kunjungan Selesai</p>
+                                        <p className="text-2xl font-bold text-green-600">{stats.completed_kunjungan || 0}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-yellow-100 rounded-lg">
+                                        <Calendar className="h-5 w-5 text-yellow-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Kunjungan Pending</p>
+                                        <p className="text-2xl font-bold text-yellow-600">{stats.pending_kunjungan || 0}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -299,12 +366,6 @@ export default function ShowCabang() {
                                                     {new Date(lead.created_at).toLocaleDateString('id-ID')}
                                                 </span>
                                             </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-gray-600">Budget</p>
-                                            <p className="font-medium">
-                                                {formatCurrency(lead.budget_min)} - {formatCurrency(lead.budget_max)}
-                                            </p>
                                         </div>
                                     </div>
                                 ))}

@@ -17,7 +17,9 @@ class TipeKarpetController extends Controller
     {
         $this->authorize('viewAny', TipeKarpet::class);
         
-        $tipeKarpets = TipeKarpet::where('is_active', true)->get();
+        $tipeKarpets = TipeKarpet::where('is_active', true)
+            ->withCount('leads')
+            ->get();
 
         return Inertia::render('tipe-karpets/index', [
             'tipeKarpets' => $tipeKarpets,

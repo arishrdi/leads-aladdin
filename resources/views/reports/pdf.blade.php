@@ -125,6 +125,48 @@
             border-top: 1px solid #ddd;
             padding-top: 10px;
         }
+        .page-break {
+            page-break-before: always;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2B5235;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #2B5235;
+            padding-bottom: 10px;
+        }
+        .compact-table {
+            font-size: 10px;
+        }
+        .compact-table th, .compact-table td {
+            padding: 5px;
+        }
+        .two-column {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .column-left, .column-right {
+            display: table-cell;
+            width: 48%;
+            vertical-align: top;
+        }
+        .column-left {
+            padding-right: 2%;
+        }
+        .mini-section {
+            margin-bottom: 20px;
+        }
+        .mini-section-title {
+            color: #2B5235;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #2B5235;
+            padding-bottom: 3px;
+        }
         .currency {
             color: #2B5235;
             font-weight: bold;
@@ -132,6 +174,7 @@
     </style>
 </head>
 <body>
+    <!-- PAGE 1: RINGKASAN STATISTIK -->
     <div class="header">
         <h1>Laporan Leads Aladdin</h1>
         <div class="period">Periode: {{ date('d/m/Y', strtotime($date_from)) }} - {{ date('d/m/Y', strtotime($date_to)) }}</div>
@@ -226,93 +269,161 @@
         </div>
     </div>
 
-    <!-- Top Performers -->
-    @if(count($performance['top_performers']) > 0)
+    @if(isset($summary['total_kunjungan']))
+    <!-- Kunjungan Statistics -->
     <div class="section">
-        <div class="section-title">Marketing Terbaik</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Ranking</th>
-                    <th>Nama Marketing</th>
-                    <th>Total Leads</th>
-                    <th>Konversi</th>
-                    <th>Total Pendapatan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($performance['top_performers'] as $index => $performer)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $performer->name }}</td>
-                    <td>{{ number_format($performer->total_leads) }}</td>
-                    <td>{{ number_format($performer->converted_leads) }}</td>
-                    <td class="currency">Rp {{ number_format($performer->total_revenue, 0, ',', '.') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div class="section-title">Statistik Kunjungan</div>
+        <div class="two-column">
+            <div class="column-left">
+                <div class="summary-box">
+                    <div class="summary-value">{{ number_format($summary['total_kunjungan'] ?? 0) }}</div>
+                    <div class="summary-label">Total Kunjungan</div>
+                </div>
+            </div>
+            <div class="column-right">
+                <div class="summary-box">
+                    <div class="summary-value">{{ number_format($summary['completed_kunjungan'] ?? 0) }}</div>
+                    <div class="summary-label">Kunjungan Selesai</div>
+                </div>
+            </div>
+        </div>
+        <div class="two-column">
+            <div class="column-left">
+                <div class="summary-box">
+                    <div class="summary-value">{{ number_format($summary['active_kunjungan'] ?? 0) }}</div>
+                    <div class="summary-label">Kunjungan Aktif</div>
+                </div>
+            </div>
+            <div class="column-right">
+                <div class="summary-box">
+                    <div class="summary-value">{{ number_format($summary['pending_kunjungan'] ?? 0) }}</div>
+                    <div class="summary-label">Kunjungan Pending</div>
+                </div>
+            </div>
+        </div>
     </div>
     @endif
 
-    <!-- Branch Performance -->
-    @if(count($performance['branch_performance']) > 0)
-    <div class="section">
-        <div class="section-title">Performa Cabang</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Ranking</th>
-                    <th>Nama Cabang</th>
-                    <th>Total Leads</th>
-                    <th>Konversi</th>
-                    <th>Total Pendapatan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($performance['branch_performance'] as $index => $branch)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $branch->nama_cabang }}</td>
-                    <td>{{ number_format($branch->total_leads) }}</td>
-                    <td>{{ number_format($branch->converted_leads) }}</td>
-                    <td class="currency">Rp {{ number_format($branch->total_revenue, 0, ',', '.') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @endif
+    <!-- PAGE 2: ANALISIS PERFORMA -->
+    <div class="page-break">
+        <div class="page-header">Analisis Performa Marketing & Cabang</div>
+        
+        @if(count($performance['top_performers']) > 0)
+        <div class="mini-section">
+            <div class="mini-section-title">Marketing Terbaik</div>
+            <table class="compact-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Nama</th>
+                        <th>Leads</th>
+                        <th>Konversi</th>
+                        <th>Pendapatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($performance['top_performers'] as $index => $performer)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $performer->name }}</td>
+                        <td>{{ number_format($performer->total_leads) }}</td>
+                        <td>{{ number_format($performer->converted_leads) }}</td>
+                        <td class="currency">Rp {{ number_format($performer->total_revenue / 1000000, 1) }}M</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
 
-    <!-- Lead Sources -->
-    @if(count($charts['lead_sources']) > 0)
-    <div class="section">
-        <div class="section-title">Sumber Leads Terbaik</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Ranking</th>
-                    <th>Sumber Leads</th>
-                    <th>Total Leads</th>
-                    <th>Persentase</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($charts['lead_sources'] as $index => $source)
-                @php
-                    $percentage = $summary['total_leads'] > 0 ? ($source->total / $summary['total_leads']) * 100 : 0;
-                @endphp
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $source->nama }}</td>
-                    <td>{{ number_format($source->total) }}</td>
-                    <td>{{ number_format($percentage, 1) }}%</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        @if(count($performance['branch_performance']) > 0)
+        <div class="mini-section">
+            <div class="mini-section-title">Performa Cabang</div>
+            <table class="compact-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Cabang</th>
+                        <th>Leads</th>
+                        <th>Konversi</th>
+                        <th>Kunjungan</th>
+                        <th>Pendapatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($performance['branch_performance'] as $index => $branch)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $branch->nama_cabang }}</td>
+                        <td>{{ number_format($branch->total_leads) }}</td>
+                        <td>{{ number_format($branch->converted_leads) }}</td>
+                        <td>{{ number_format($branch->total_kunjungan ?? 0) }}/{{ number_format($branch->completed_kunjungan ?? 0) }}</td>
+                        <td class="currency">Rp {{ number_format($branch->total_revenue / 1000000, 1) }}M</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
     </div>
-    @endif
+
+    <!-- PAGE 3: ANALISIS SUMBER LEADS & FOLLOW-UP -->
+    <div class="page-break">
+        <div class="page-header">Analisis Sumber Leads & Efektivitas Follow-up</div>
+        
+        @if(count($charts['lead_sources']) > 0)
+        <div class="mini-section">
+            <div class="mini-section-title">Sumber Leads Terbaik</div>
+            <table class="compact-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Sumber Leads</th>
+                        <th>Total</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($charts['lead_sources'] as $index => $source)
+                    @php
+                        $percentage = $summary['total_leads'] > 0 ? ($source->total / $summary['total_leads']) * 100 : 0;
+                    @endphp
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $source->nama }}</td>
+                        <td>{{ number_format($source->total) }}</td>
+                        <td>{{ number_format($percentage, 1) }}%</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+        
+        @if(isset($charts['follow_up_stats']) && count($charts['follow_up_stats']) > 0)
+        <div class="mini-section">
+            <div class="mini-section-title">Efektivitas Follow-up</div>
+            <table class="compact-table">
+                <thead>
+                    <tr>
+                        <th>Tahap</th>
+                        <th>Total FU</th>
+                        <th>Avg Percobaan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($charts['follow_up_stats'] as $stat)
+                    <tr>
+                        <td>{{ $stat->stage }}</td>
+                        <td>{{ number_format($stat->total) }}</td>
+                        <td>{{ number_format($stat->avg_attempts ?? 0, 1) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+    </div>
 
     <div class="footer">
         <p>Laporan digenerate pada {{ now()->format('d/m/Y H:i:s') }} WIB</p>

@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ReportController extends Controller
 {
@@ -66,6 +68,27 @@ class ReportController extends Controller
         $averageDeal = $customerLeads > 0 ? $totalRevenue / $customerLeads : 0;
         $conversionRate = $totalLeads > 0 ? ($customerLeads / $totalLeads) * 100 : 0;
 
+        // Get kunjungan statistics
+        $kunjunganQuery = DB::table('kunjungans')
+            ->whereBetween('created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+        
+        // Apply active branch filtering for kunjungan
+        if ($activeBranch) {
+            $kunjunganQuery->where('cabang_id', $activeBranch->id);
+        } elseif ($user->role === 'supervisor') {
+            $userCabangIds = $user->cabangs->pluck('id');
+            $kunjunganQuery->whereIn('cabang_id', $userCabangIds);
+        }
+        
+        if ($cabangId) {
+            $kunjunganQuery->where('cabang_id', $cabangId);
+        }
+        
+        $totalKunjungan = (clone $kunjunganQuery)->count();
+        $activeKunjungan = (clone $kunjunganQuery)->where('status', 'ACTIVE')->count();
+        $completedKunjungan = (clone $kunjunganQuery)->where('status', 'COMPLETED')->count();
+        $pendingKunjungan = (clone $kunjunganQuery)->where('status', 'PENDING')->count();
+
         // Lead sources analysis
         $leadSources = (clone $leadsQuery)
             ->select('sumber_leads.nama', DB::raw('count(*) as total'))
@@ -94,12 +117,14 @@ class ReportController extends Controller
             ->limit(10)
             ->get();
 
-        // Branch performance
+        // Branch performance with kunjungan data
         $branchPerformance = (clone $leadsQuery)
             ->select('cabangs.nama_cabang', 
                 DB::raw('count(*) as total_leads'),
                 DB::raw('sum(case when status = "CUSTOMER" then 1 else 0 end) as converted_leads'),
-                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue')
+                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue'),
+                DB::raw('(select count(*) from kunjungans where kunjungans.cabang_id = cabangs.id and kunjungans.created_at between "' . $dateFrom . ' 00:00:00" and "' . $dateTo . ' 23:59:59") as total_kunjungan'),
+                DB::raw('(select count(*) from kunjungans where kunjungans.cabang_id = cabangs.id and kunjungans.status = "COMPLETED" and kunjungans.created_at between "' . $dateFrom . ' 00:00:00" and "' . $dateTo . ' 23:59:59") as completed_kunjungan')
             )
             ->join('cabangs', 'leads.cabang_id', '=', 'cabangs.id')
             ->groupBy('cabangs.id', 'cabangs.nama_cabang')
@@ -143,6 +168,10 @@ class ReportController extends Controller
                 'total_revenue' => $totalRevenue,
                 'average_deal' => $averageDeal,
                 'conversion_rate' => $conversionRate,
+                'total_kunjungan' => $totalKunjungan,
+                'active_kunjungan' => $activeKunjungan,
+                'completed_kunjungan' => $completedKunjungan,
+                'pending_kunjungan' => $pendingKunjungan,
             ],
             'charts' => [
                 'lead_sources' => $leadSources,
@@ -175,7 +204,7 @@ class ReportController extends Controller
         $format = $request->get('format', 'excel'); // excel or pdf
 
         // Build query with same filters as index
-        $leadsQuery = Leads::with(['user', 'cabang', 'sumberLeads', 'tipeKarpet'])
+        $leadsQuery = Leads::with(['user', 'cabang', 'sumberLeads', 'tipeKarpet', 'followUps'])
             ->whereBetween('leads.created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
 
         // Apply active branch filtering first (if set)
@@ -207,62 +236,210 @@ class ReportController extends Controller
 
     private function exportToExcel($leads, $dateFrom, $dateTo)
     {
-        $filename = "laporan_leads_{$dateFrom}_to_{$dateTo}.csv";
+        $filename = "laporan_leads_{$dateFrom}_to_{$dateTo}.xlsx";
         
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        // Create new Spreadsheet object
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Laporan Leads');
+
+        // Get all active follow-up stages
+        $followUpStages = \App\Models\FollowUpStage::getActiveStages();
+        
+        // Build basic headers (row 2)
+        $basicHeaders = [
+            'No',
+            'Tanggal Dibuat',
+            'Nama Pelanggan',
+            'Sapaan',
+            'No WhatsApp',
+            'Nama Masjid/Instansi',
+            'Alamat',
+            'Status',
+            'Sumber Leads',
+            'Tipe Karpet',
         ];
 
-        $callback = function() use ($leads) {
-            $file = fopen('php://output', 'w');
-            
-            // CSV Headers
-            fputcsv($file, [
-                'Tanggal Dibuat',
-                'Nama Pelanggan',
-                'Sapaan',
-                'No WhatsApp',
-                'Nama Masjid/Instansi',
-                'Alamat',
-                'Status',
-                'Sumber Leads',
-                'Tipe Karpet',
-                'Budget Min',
-                'Budget Max',
-                'Nominal Deal',
-                'Tanggal Closing',
-                'PIC Marketing',
-                'Cabang',
-                'Catatan'
-            ]);
+        // Set basic headers in row 2
+        $currentCol = 1;
+        foreach ($basicHeaders as $header) {
+            $cellRef = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($currentCol);
+            $sheet->setCellValue("{$cellRef}1", $header);
+            $sheet->mergeCells("{$cellRef}1:{$cellRef}2"); // Merge with row 2
+            $currentCol++;
+        }
 
-            // CSV Data
-            foreach ($leads as $lead) {
-                fputcsv($file, [
-                    $lead->created_at->format('d/m/Y H:i'),
-                    $lead->nama_pelanggan,
-                    $lead->sapaan,
-                    $lead->no_whatsapp,
-                    $lead->nama_masjid_instansi,
-                    $lead->alamat,
-                    $lead->status,
-                    $lead->sumberLeads->nama ?? '',
-                    $lead->tipeKarpet->nama ?? '',
-                    $lead->budget_min,
-                    $lead->budget_max,
-                    $lead->nominal_deal ?? '',
-                    $lead->tanggal_closing ? $lead->tanggal_closing->format('d/m/Y') : '',
-                    $lead->user->name ?? '',
-                    $lead->cabang->nama_cabang ?? '',
-                    $lead->catatan
-                ]);
+        // Add follow-up stage headers with merged columns
+        foreach ($followUpStages as $stageKey => $stageName) {
+            $startCol = $currentCol;
+            $endCol = $currentCol + 2; // 3 columns for attempts
+            
+            // Set stage name in row 1 (merged across 3 columns)
+            $startCellRef = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($startCol);
+            $endCellRef = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($endCol);
+            $sheet->setCellValue("{$startCellRef}1", $stageName);
+            $sheet->mergeCells("{$startCellRef}1:{$endCellRef}1");
+            
+            // Set attempt numbers in row 2
+            for ($i = 1; $i <= 3; $i++) {
+                $cellRef = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($startCol + $i - 1);
+                $sheet->setCellValue("{$cellRef}2", $i);
+            }
+            
+            $currentCol += 3;
+        }
+
+        // Add final headers
+        $finalHeaders = [
+            'Tanggal Closing',
+            'Alasan Closing',
+            'Alasan Tidak Closing',
+            'PIC Marketing',
+            'Cabang',
+            'Catatan'
+        ];
+
+        foreach ($finalHeaders as $header) {
+            $cellRef = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($currentCol);
+            $sheet->setCellValue("{$cellRef}1", $header);
+            $sheet->mergeCells("{$cellRef}1:{$cellRef}2"); // Merge with row 2
+            $currentCol++;
+        }
+        
+        // Style headers
+        $lastColumnRef = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($currentCol - 1);
+        $headerRange1 = "A1:{$lastColumnRef}1";
+        $headerRange2 = "A2:{$lastColumnRef}2";
+        
+        // Style row 1 (stage names)
+        $sheet->getStyle($headerRange1)->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FF2B5235']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FFFFFFFF']
+                ]
+            ]
+        ]);
+        
+        // Style row 2 (attempt numbers)
+        $sheet->getStyle($headerRange2)->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['argb' => 'FFFFFFFF']
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FF2B5235']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FFFFFFFF']
+                ]
+            ]
+        ]);
+        
+        // Set row heights for headers
+        $sheet->getRowDimension(1)->setRowHeight(25);
+        $sheet->getRowDimension(2)->setRowHeight(20);
+
+        // Write data
+        $row = 3; // Start from row 3 since we have 2-row headers
+        $counter = 1;
+        foreach ($leads as $lead) {
+            // Get all follow-ups for this lead
+            $followUps = $lead->followUps()->get()->groupBy('stage');
+
+            $data = [
+                $counter++,
+                $lead->created_at->format('d/m/Y H:i'),
+                $lead->nama_pelanggan,
+                $lead->sapaan,
+                $lead->no_whatsapp,
+                $lead->nama_masjid_instansi ?? '',
+                $lead->alamat ?? '',
+                $lead->status,
+                $lead->sumberLeads->nama ?? '',
+                $lead->tipeKarpet->nama ?? '',
+            ];
+
+            // Add follow-up data for each stage
+            foreach ($followUpStages as $stageKey => $stageName) {
+                $stageFollowUps = $followUps->get($stageKey, collect());
+                
+                // Initialize attempt dates
+                $attempt1Date = '';
+                $attempt2Date = '';
+                $attempt3Date = '';
+
+                foreach ($stageFollowUps as $followUp) {
+                    if ($followUp->attempt_1_completed && $followUp->attempt_1_completed_at) {
+                        $attempt1Date = $followUp->attempt_1_completed_at->format('d/m/Y');
+                    }
+                    if ($followUp->attempt_2_completed && $followUp->attempt_2_completed_at) {
+                        $attempt2Date = $followUp->attempt_2_completed_at->format('d/m/Y');
+                    }
+                    if ($followUp->attempt_3_completed && $followUp->attempt_3_completed_at) {
+                        $attempt3Date = $followUp->attempt_3_completed_at->format('d/m/Y');
+                    }
+                }
+
+                $data[] = $attempt1Date;
+                $data[] = $attempt2Date;
+                $data[] = $attempt3Date;
             }
 
-            fclose($file);
-        };
+            $data = array_merge($data, [
+                $lead->tanggal_closing ? $lead->tanggal_closing->format('d/m/Y') : '',
+                $lead->alasan_closing ?? '',
+                $lead->alasan_tidak_closing ?? '',
+                $lead->user->name ?? '',
+                $lead->cabang->nama_cabang ?? '',
+                $lead->catatan ?? ''
+            ]);
 
-        return response()->stream($callback, 200, $headers);
+            $sheet->fromArray($data, null, "A{$row}");
+            $row++;
+        }
+
+        // Auto-size columns
+        $highestColumn = $sheet->getHighestColumn();
+        $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+        
+        for ($i = 1; $i <= $highestColumnIndex; $i++) {
+            $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
+        }
+
+        // Create writer and save
+        $writer = new Xlsx($spreadsheet);
+        
+        // Set headers for download
+        $headers = [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'max-age=0',
+        ];
+
+        return response()->stream(function() use ($writer) {
+            $writer->save('php://output');
+        }, 200, $headers);
     }
 
     private function exportToPdf($leads, $dateFrom, $dateTo)
@@ -303,6 +480,27 @@ class ReportController extends Controller
         $averageDeal = $customerLeads > 0 ? $totalRevenue / $customerLeads : 0;
         $conversionRate = $totalLeads > 0 ? ($customerLeads / $totalLeads) * 100 : 0;
 
+        // Get kunjungan statistics for PDF
+        $kunjunganQuery = DB::table('kunjungans')
+            ->whereBetween('created_at', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+        
+        // Apply active branch filtering for kunjungan
+        if ($activeBranch) {
+            $kunjunganQuery->where('cabang_id', $activeBranch->id);
+        } elseif ($user->role === 'supervisor') {
+            $userCabangIds = $user->cabangs->pluck('id');
+            $kunjunganQuery->whereIn('cabang_id', $userCabangIds);
+        }
+        
+        if (request()->cabang_id) {
+            $kunjunganQuery->where('cabang_id', request()->cabang_id);
+        }
+        
+        $totalKunjungan = (clone $kunjunganQuery)->count();
+        $activeKunjungan = (clone $kunjunganQuery)->where('status', 'ACTIVE')->count();
+        $completedKunjungan = (clone $kunjunganQuery)->where('status', 'COMPLETED')->count();
+        $pendingKunjungan = (clone $kunjunganQuery)->where('status', 'PENDING')->count();
+
         // Lead sources analysis
         $leadSources = (clone $leadsQuery)
             ->select('sumber_leads.nama', DB::raw('count(*) as total'))
@@ -324,12 +522,14 @@ class ReportController extends Controller
             ->limit(10)
             ->get();
 
-        // Branch performance
+        // Branch performance with kunjungan data
         $branchPerformance = (clone $leadsQuery)
             ->select('cabangs.nama_cabang', 
                 DB::raw('count(*) as total_leads'),
                 DB::raw('sum(case when status = "CUSTOMER" then 1 else 0 end) as converted_leads'),
-                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue')
+                DB::raw('sum(case when status = "CUSTOMER" then nominal_deal else 0 end) as total_revenue'),
+                DB::raw('(select count(*) from kunjungans where kunjungans.cabang_id = cabangs.id and kunjungans.created_at between "' . $dateFrom . ' 00:00:00" and "' . $dateTo . ' 23:59:59") as total_kunjungan'),
+                DB::raw('(select count(*) from kunjungans where kunjungans.cabang_id = cabangs.id and kunjungans.status = "COMPLETED" and kunjungans.created_at between "' . $dateFrom . ' 00:00:00" and "' . $dateTo . ' 23:59:59") as completed_kunjungan')
             )
             ->join('cabangs', 'leads.cabang_id', '=', 'cabangs.id')
             ->groupBy('cabangs.id', 'cabangs.nama_cabang')
@@ -348,6 +548,10 @@ class ReportController extends Controller
                 'total_revenue' => $totalRevenue,
                 'average_deal' => $averageDeal,
                 'conversion_rate' => $conversionRate,
+                'total_kunjungan' => $totalKunjungan,
+                'active_kunjungan' => $activeKunjungan,
+                'completed_kunjungan' => $completedKunjungan,
+                'pending_kunjungan' => $pendingKunjungan,
             ],
             'charts' => [
                 'lead_sources' => $leadSources,

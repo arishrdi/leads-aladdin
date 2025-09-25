@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { type User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Users, Calendar, Plus, FileText } from 'lucide-react';
+import { LayoutGrid, Users, Calendar, Plus, FileText, MapPin } from 'lucide-react';
 
 interface MobileNavProps {
     user: User;
@@ -30,9 +30,9 @@ export function MobileNav({ user }: MobileNavProps) {
             color: 'bg-[#2B5235]',
         },
         {
-            title: 'Tambah Lead',
-            href: '/leads/create',
-            icon: Plus,
+            title: 'Kunjungan',
+            href: '/kunjungans',
+            icon: MapPin,
             color: 'bg-[#2B5235]',
         },
     ];

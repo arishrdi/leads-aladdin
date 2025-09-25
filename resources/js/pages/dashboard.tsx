@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Users, Target, TrendingUp, Calendar, Plus, Bell, ArrowUp, ArrowDown, BarChart3, Activity, GitCompare, X, Check } from 'lucide-react';
+import { Users, Target, TrendingUp, Calendar, Plus, Bell, ArrowUp, ArrowDown, BarChart3, Activity, GitCompare, X, Check, MapPin, UserCheck } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -36,12 +36,22 @@ interface DashboardProps extends PageProps {
         customers: number;
         todays_followups: number;
         overdue_followups: number;
+        total_kunjungan: number;
+        active_kunjungan: number;
+        completed_kunjungan: number;
     };
     recent_leads: Array<{
         id: number;
         nama_pelanggan: string;
         status: string;
         tanggal_leads: string;
+    }>;
+    recent_kunjungan: Array<{
+        id: number;
+        nama_masjid: string;
+        status: string;
+        waktu_canvasing: string;
+        bertemu_dengan: string;
     }>;
     todays_followups: Array<{
         id: number;
@@ -91,6 +101,10 @@ interface DashboardProps extends PageProps {
             this_month_customers: number;
             todays_followups: number;
             overdue_followups: number;
+            total_kunjungan: number;
+            active_kunjungan: number;
+            completed_kunjungan: number;
+            this_month_kunjungan: number;
         };
         recent_leads: Array<{
             id: number;
@@ -146,7 +160,7 @@ const LeadItemSkeleton = () => (
 );
 
 export default function Dashboard() {
-    const { auth, stats, recent_leads, todays_followups, analytics, outlet_comparison, all_branches } = usePage<DashboardProps>().props;
+    const { auth, stats, recent_leads, recent_kunjungan, todays_followups, analytics, outlet_comparison, all_branches } = usePage<DashboardProps>().props;
     const isMarketing = auth.user.role === 'marketing';
     const canViewAnalytics = auth.user.role === 'supervisor' || auth.user.role === 'super_user';
     const isSuperUser = auth.user.role === 'super_user';
@@ -283,7 +297,7 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                         <div className="mt-2 text-xs text-muted-foreground">
-                                            {branch.stats.total_leads} leads • {branch.stats.customers} customer
+                                            {branch.stats.total_leads} leads • {branch.stats.customers} customer • {branch.stats.total_kunjungan || 0} kunjungan
                                         </div>
                                     </div>
                                 ))}
@@ -334,6 +348,7 @@ export default function Dashboard() {
                                                 <th className="text-center p-2 font-medium text-muted-foreground">Konversi</th>
                                                 <th className="text-center p-2 font-medium text-muted-foreground">Revenue</th>
                                                 <th className="text-center p-2 font-medium text-muted-foreground">Follow-up</th>
+                                                <th className="text-center p-2 font-medium text-muted-foreground">Kunjungan</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -375,6 +390,10 @@ export default function Dashboard() {
                                                     <td className="text-center p-2">
                                                         <div className="text-sm font-medium text-brand-primary">{branch.stats.todays_followups}</div>
                                                         <div className="text-xs text-red-600">{branch.stats.overdue_followups} terlambat</div>
+                                                    </td>
+                                                    <td className="text-center p-2">
+                                                        <div className="text-sm font-medium text-purple-600">{branch.stats.total_kunjungan || 0}</div>
+                                                        <div className="text-xs text-green-600">{branch.stats.completed_kunjungan || 0} selesai</div>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -495,81 +514,131 @@ export default function Dashboard() {
                     </div>
                 ) : (
                     <>
-                        {/* Normal Dashboard Content - Stats Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Leads</CardTitle>
-                            <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-brand-primary/10 transition-colors">
-                                <Users className="h-5 w-5 text-brand-primary" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="text-3xl font-bold text-brand-primary animate-scale-in">{stats?.total_leads || 0}</div>
-                                    <p className="text-xs text-muted-foreground mt-1">Total keseluruhan</p>
-                                </div>
-                                <ProgressRing 
-                                    progress={75} 
-                                    size={50} 
-                                    showPercentage={false}
-                                    color="var(--brand-primary)"
-                                />
-                            </div>
-                            <div className="mt-3">
-                                <TrendChart data={[45, 52, 48, 61, 58, 67, 73]} trend="up" />
-                            </div>
-                        </CardContent>
-                    </Card>
+                        {/* Normal Dashboard Content - Leads Stats Cards */}
+                        <div className="space-y-6">
+                            <div>
+                                <h2 className="text-lg font-semibold text-brand-primary mb-4">Statistik Leads</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in">
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Leads</CardTitle>
+                                            <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-brand-primary/10 transition-colors">
+                                                <Users className="h-5 w-5 text-brand-primary" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <div className="text-3xl font-bold text-brand-primary animate-scale-in">{stats?.total_leads || 0}</div>
+                                                    <p className="text-xs text-muted-foreground mt-1">Total keseluruhan</p>
+                                                </div>
+                                                <ProgressRing 
+                                                    progress={75} 
+                                                    size={50} 
+                                                    showPercentage={false}
+                                                    color="var(--brand-primary)"
+                                                />
+                                            </div>
+                                            <div className="mt-3">
+                                                <TrendChart data={[45, 52, 48, 61, 58, 67, 73]} trend="up" />
+                                            </div>
+                                        </CardContent>
+                                    </Card>
 
-                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Leads Warm</CardTitle>
-                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950 group-hover:bg-blue-100 dark:group-hover:bg-blue-900 transition-colors">
-                                <Target className="h-5 w-5 text-status-warm" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="text-3xl font-bold text-status-warm animate-scale-in" style={{ animationDelay: '0.2s' }}>{stats?.warm_leads || 0}</div>
-                                    <p className="text-xs text-muted-foreground mt-1">Berpotensi menjadi hot</p>
-                                </div>
-                                <div className="flex items-center gap-1 text-status-warm">
-                                    <ArrowUp className="h-4 w-4" />
-                                    <span className="text-sm font-medium">+12%</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                            <CardTitle className="text-sm font-medium text-muted-foreground">Leads Warm</CardTitle>
+                                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950 group-hover:bg-blue-100 dark:group-hover:bg-blue-900 transition-colors">
+                                                <Target className="h-5 w-5 text-status-warm" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <div className="text-3xl font-bold text-status-warm animate-scale-in" style={{ animationDelay: '0.2s' }}>{stats?.warm_leads || 0}</div>
+                                                    <p className="text-xs text-muted-foreground mt-1">Berpotensi menjadi hot</p>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-status-warm">
+                                                    <ArrowUp className="h-4 w-4" />
+                                                    <span className="text-sm font-medium">+12%</span>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
 
-                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Leads Hot</CardTitle>
-                            <div className="p-2 rounded-lg bg-orange-50 dark:bg-orange-950 group-hover:bg-orange-100 dark:group-hover:bg-orange-900 transition-colors">
-                                <TrendingUp className="h-5 w-5 text-status-hot" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-status-hot animate-scale-in" style={{ animationDelay: '0.3s' }}>{stats?.hot_leads || 0}</div>
-                            <p className="text-xs text-muted-foreground mt-1">Siap untuk closing</p>
-                        </CardContent>
-                    </Card>
+                                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                            <CardTitle className="text-sm font-medium text-muted-foreground">Leads Hot</CardTitle>
+                                            <div className="p-2 rounded-lg bg-orange-50 dark:bg-orange-950 group-hover:bg-orange-100 dark:group-hover:bg-orange-900 transition-colors">
+                                                <TrendingUp className="h-5 w-5 text-status-hot" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="text-3xl font-bold text-status-hot animate-scale-in" style={{ animationDelay: '0.3s' }}>{stats?.hot_leads || 0}</div>
+                                            <p className="text-xs text-muted-foreground mt-1">Siap untuk closing</p>
+                                        </CardContent>
+                                    </Card>
 
-                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Customer</CardTitle>
-                            <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950 group-hover:bg-green-100 dark:group-hover:bg-green-900 transition-colors">
-                                <TrendingUp className="h-5 w-5 text-status-customer" />
+                                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                            <CardTitle className="text-sm font-medium text-muted-foreground">Customer</CardTitle>
+                                            <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950 group-hover:bg-green-100 dark:group-hover:bg-green-900 transition-colors">
+                                                <TrendingUp className="h-5 w-5 text-status-customer" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="text-3xl font-bold text-status-customer animate-scale-in" style={{ animationDelay: '0.4s' }}>{stats?.customers || 0}</div>
+                                            <p className="text-xs text-muted-foreground mt-1">Berhasil closing</p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-status-customer animate-scale-in" style={{ animationDelay: '0.4s' }}>{stats?.customers || 0}</div>
-                            <p className="text-xs text-muted-foreground mt-1">Berhasil closing</p>
-                        </CardContent>
-                    </Card>
-                </div>
+
+                            {/* Kunjungan Stats Cards */}
+                            <div>
+                                <h2 className="text-lg font-semibold text-brand-primary mb-4">Statistik Kunjungan</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Kunjungan</CardTitle>
+                                            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950 group-hover:bg-purple-100 dark:group-hover:bg-purple-900 transition-colors">
+                                                <MapPin className="h-5 w-5 text-purple-600" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="text-3xl font-bold text-purple-600 animate-scale-in" style={{ animationDelay: '0.6s' }}>{stats?.total_kunjungan || 0}</div>
+                                            <p className="text-xs text-muted-foreground mt-1">Total kunjungan canvasing</p>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                            <CardTitle className="text-sm font-medium text-muted-foreground">Kunjungan Aktif</CardTitle>
+                                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950 group-hover:bg-blue-100 dark:group-hover:bg-blue-900 transition-colors">
+                                                <Activity className="h-5 w-5 text-blue-600" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="text-3xl font-bold text-blue-600 animate-scale-in" style={{ animationDelay: '0.7s' }}>{stats?.active_kunjungan || 0}</div>
+                                            <p className="text-xs text-muted-foreground mt-1">Sedang berlangsung</p>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="border-border/50 shadow-soft hover-lift animate-fade-in" style={{ animationDelay: '0.7s' }}>
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                                            <CardTitle className="text-sm font-medium text-muted-foreground">Kunjungan Selesai</CardTitle>
+                                            <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950 group-hover:bg-green-100 dark:group-hover:bg-green-900 transition-colors">
+                                                <UserCheck className="h-5 w-5 text-green-600" />
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="text-3xl font-bold text-green-600 animate-scale-in" style={{ animationDelay: '0.8s' }}>{stats?.completed_kunjungan || 0}</div>
+                                            <p className="text-xs text-muted-foreground mt-1">Sudah diselesaikan</p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </div>
+                        </div>
 
                 {/* Status Distribution */}
                 <Card className="border-border/50 shadow-soft animate-fade-in" style={{ animationDelay: '0.4s' }}>
@@ -641,8 +710,8 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                {/* Recent Leads & Today's Follow-ups */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Recent Leads & Kunjungan */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                     {/* Recent Leads */}
                     <Card className="border-border/50 shadow-soft">
                         <CardHeader>
@@ -680,6 +749,57 @@ export default function Dashboard() {
                                 <Link href="/leads">
                                     <Button variant="outline" className="w-full touch-target">
                                         Lihat Semua Leads
+                                    </Button>
+                                </Link>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Recent Kunjungan */}
+                    <Card className="border-border/50 shadow-soft">
+                        <CardHeader>
+                            <CardTitle className="text-brand-primary">Kunjungan Terbaru</CardTitle>
+                            <CardDescription>
+                                {recent_kunjungan?.length || 0} kunjungan terbaru
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {recent_kunjungan?.map((kunjungan) => (
+                                    <div key={kunjungan.id} className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                                        <div className="flex items-start justify-between">
+                                            <div className="space-y-1 flex-1">
+                                                <p className="font-medium text-foreground">{kunjungan.nama_masjid}</p>
+                                                <p className="text-sm text-muted-foreground">Bertemu: {kunjungan.bertemu_dengan}</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {new Date(kunjungan.waktu_canvasing).toLocaleDateString('id-ID', {
+                                                        weekday: 'short',
+                                                        day: 'numeric',
+                                                        month: 'short'
+                                                    })}
+                                                </p>
+                                            </div>
+                                            <div className={`px-2 py-1 rounded text-xs font-medium ${
+                                                kunjungan.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                kunjungan.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                            }`}>
+                                                {kunjungan.status === 'completed' ? 'Selesai' :
+                                                 kunjungan.status === 'in_progress' ? 'Berlangsung' : 'Pending'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) || (
+                                    <div className="text-center py-8">
+                                        <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                        <p className="text-muted-foreground">Belum ada kunjungan</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="mt-6">
+                                <Link href="/kunjungans">
+                                    <Button variant="outline" className="w-full touch-target">
+                                        Lihat Semua Kunjungan
                                     </Button>
                                 </Link>
                             </div>

@@ -54,16 +54,24 @@ interface FollowUp {
 }
 
 interface PageProps {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            role: string;
+        };
+    };
     followUp: FollowUp;
     config: {
         followUpStages: Record<string, string>;
         alasanClosing: Record<string, string>;
         alasanTidakClosing: Record<string, string>;
     };
+    canEdit: boolean;
 }
 
 export default function ShowFollowUp() {
-    const { followUp, config } = usePage<PageProps>().props;
+    const { auth, followUp, config, canEdit } = usePage<PageProps>().props;
     const [showCompleteForm, setShowCompleteForm] = useState(false);
     const [showRescheduleForm, setShowRescheduleForm] = useState(false);
 
@@ -292,8 +300,8 @@ export default function ShowFollowUp() {
                     </Card>
                 </div>
 
-                {/* Action Buttons */}
-                {followUp.status === 'scheduled' && (
+                {/* Action Buttons - Only for Marketing users who can edit */}
+                {followUp.status === 'scheduled' && canEdit && (
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button
                             onClick={() => setShowCompleteForm(true)}
@@ -315,8 +323,24 @@ export default function ShowFollowUp() {
                     </div>
                 )}
 
-                {/* Complete Follow-up Form */}
-                {showCompleteForm && (
+                {/* Read-only message for supervisors and super users */}
+                {!canEdit && (
+                    <Card className="border-blue-200 bg-blue-50">
+                        <CardContent className="pt-6">
+                            <div className="text-center text-blue-800">
+                                <p className="font-medium">Mode Tampilan Saja</p>
+                                <p className="text-sm text-blue-600 mt-1">
+                                    Anda dapat melihat detail follow-up ini, tetapi tidak dapat melakukan perubahan.
+                                    {auth.user.role === 'supervisor' && ' Hanya marketing yang dapat mengelola follow-up.'}
+                                    {auth.user.role === 'super_user' && ' Hanya marketing yang dapat mengelola follow-up.'}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Complete Follow-up Form - Only for users who can edit */}
+                {showCompleteForm && canEdit && (
                     <Card>
                         <CardHeader>
                             <CardTitle>Selesaikan Follow-up</CardTitle>
@@ -496,8 +520,8 @@ export default function ShowFollowUp() {
                     </Card>
                 )}
 
-                {/* Reschedule Form */}
-                {showRescheduleForm && (
+                {/* Reschedule Form - Only for users who can edit */}
+                {showRescheduleForm && canEdit && (
                     <Card>
                         <CardHeader>
                             <CardTitle>Ubah Jadwal Follow-up</CardTitle>

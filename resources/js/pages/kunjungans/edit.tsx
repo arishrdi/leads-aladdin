@@ -1,16 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { DatePicker } from '@/components/ui/date-picker';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Calendar, MapPin, Phone, User, Building, Camera, FileText, Settings, Eye } from 'lucide-react';
+import { ArrowLeft, Building, Calendar, Camera, Download, FileText, MapPin, Phone, Settings, User } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
+import { format, parseISO } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -72,10 +74,11 @@ interface PageProps {
 export default function EditKunjungan() {
     const { kunjungan, cabangs, itemCategories, config } = usePage<PageProps>().props;
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    
+    const [selectedDate, setSelectedDate] = useState<Date>(parseISO(kunjungan.waktu_canvasing));
+
     // Build initial item responses from existing data
     const initialItemResponses: Record<string, string> = {};
-    kunjungan.kunjungan_items.forEach(item => {
+    kunjungan.kunjungan_items.forEach((item) => {
         if (item.pivot) {
             initialItemResponses[item.id.toString()] = item.pivot.status;
         }
@@ -114,13 +117,11 @@ export default function EditKunjungan() {
     const handleItemResponse = (itemId: number, value: string, inputType: string) => {
         if (inputType === 'radio') {
             // For radio, we need to clear other selections in the same category
-            const category = itemCategories.find(cat => 
-                cat.active_kunjungan_items.some(item => item.id === itemId)
-            );
+            const category = itemCategories.find((cat) => cat.active_kunjungan_items.some((item) => item.id === itemId));
             if (category) {
                 const newResponses = { ...data.item_responses };
                 // Clear all items in this category first
-                category.active_kunjungan_items.forEach(item => {
+                category.active_kunjungan_items.forEach((item) => {
                     delete newResponses[item.id.toString()];
                 });
                 // Set the selected item
@@ -140,12 +141,12 @@ export default function EditKunjungan() {
         const units = ['B', 'KB', 'MB', 'GB'];
         let size = bytes;
         let unitIndex = 0;
-        
+
         while (size >= 1024 && unitIndex < units.length - 1) {
             size /= 1024;
             unitIndex++;
         }
-        
+
         return `${size.toFixed(1)} ${units[unitIndex]}`;
     };
 
@@ -154,7 +155,7 @@ export default function EditKunjungan() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Kunjungan - ${kunjungan.nama_masjid} - Leads Aladdin`} />
-            
+
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center gap-4">
@@ -162,17 +163,15 @@ export default function EditKunjungan() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-brand-primary">Edit Kunjungan</h1>
-                        <p className="text-muted-foreground">
-                            {kunjungan.nama_masjid}
-                        </p>
+                        <h1 className="text-brand-primary text-2xl font-bold">Edit Kunjungan</h1>
+                        <p className="text-muted-foreground">{kunjungan.nama_masjid}</p>
                     </div>
                 </div>
 
                 <form onSubmit={submit} className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         {/* Basic Information */}
-                        <Card className="border-border/50 shadow-soft">
+                        <Card className="shadow-soft border-border/50">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Building className="h-5 w-5" />
@@ -196,33 +195,30 @@ export default function EditKunjungan() {
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        {errors.cabang_id && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.cabang_id}</p>
-                                        )}
+                                        {errors.cabang_id && <p className="mt-1 text-sm text-red-500">{errors.cabang_id}</p>}
                                     </div>
                                 )}
 
                                 <div>
                                     <Label htmlFor="waktu_canvasing">Waktu Canvasing *</Label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input
-                                            id="waktu_canvasing"
-                                            type="date"
-                                            value={data.waktu_canvasing}
-                                            onChange={(e) => setData('waktu_canvasing', e.target.value)}
-                                            className={`pl-10 ${errors.waktu_canvasing ? 'border-red-500' : ''}`}
-                                        />
-                                    </div>
-                                    {errors.waktu_canvasing && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.waktu_canvasing}</p>
-                                    )}
+                                    <DatePicker
+                                        date={selectedDate}
+                                        onDateChange={(date) => {
+                                            if (date) {
+                                                setSelectedDate(date);
+                                                setData('waktu_canvasing', format(date, 'yyyy-MM-dd'));
+                                            }
+                                        }}
+                                        placeholder="Pilih tanggal kunjungan"
+                                        className={errors.waktu_canvasing ? 'border-red-500' : ''}
+                                    />
+                                    {errors.waktu_canvasing && <p className="mt-1 text-sm text-red-500">{errors.waktu_canvasing}</p>}
                                 </div>
 
                                 <div>
                                     <Label htmlFor="bertemu_dengan">Bertemu Dengan *</Label>
                                     <div className="relative">
-                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                        <User className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                                         <Input
                                             id="bertemu_dengan"
                                             value={data.bertemu_dengan}
@@ -231,15 +227,13 @@ export default function EditKunjungan() {
                                             className={`pl-10 ${errors.bertemu_dengan ? 'border-red-500' : ''}`}
                                         />
                                     </div>
-                                    {errors.bertemu_dengan && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.bertemu_dengan}</p>
-                                    )}
+                                    {errors.bertemu_dengan && <p className="mt-1 text-sm text-red-500">{errors.bertemu_dengan}</p>}
                                 </div>
 
                                 <div>
                                     <Label htmlFor="nomor_aktif_takmir">Nomor Aktif Takmir *</Label>
                                     <div className="relative">
-                                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                        <Phone className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                                         <Input
                                             id="nomor_aktif_takmir"
                                             value={data.nomor_aktif_takmir}
@@ -248,9 +242,7 @@ export default function EditKunjungan() {
                                             className={`pl-10 ${errors.nomor_aktif_takmir ? 'border-red-500' : ''}`}
                                         />
                                     </div>
-                                    {errors.nomor_aktif_takmir && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.nomor_aktif_takmir}</p>
-                                    )}
+                                    {errors.nomor_aktif_takmir && <p className="mt-1 text-sm text-red-500">{errors.nomor_aktif_takmir}</p>}
                                 </div>
 
                                 <div>
@@ -261,19 +253,19 @@ export default function EditKunjungan() {
                                         </SelectTrigger>
                                         <SelectContent>
                                             {Object.entries(config.statuses).map(([key, label]) => (
-                                                <SelectItem key={key} value={key}>{key}</SelectItem>
+                                                <SelectItem key={key} value={key}>
+                                                    {key}
+                                                </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.status && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.status}</p>
-                                    )}
+                                    {errors.status && <p className="mt-1 text-sm text-red-500">{errors.status}</p>}
                                 </div>
                             </CardContent>
                         </Card>
 
                         {/* Mosque Information */}
-                        <Card className="border-border/50 shadow-soft">
+                        <Card className="shadow-soft border-border/50">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Building className="h-5 w-5" />
@@ -290,27 +282,23 @@ export default function EditKunjungan() {
                                         placeholder="Masjid Al-Ikhlas"
                                         className={errors.nama_masjid ? 'border-red-500' : ''}
                                     />
-                                    {errors.nama_masjid && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.nama_masjid}</p>
-                                    )}
+                                    {errors.nama_masjid && <p className="mt-1 text-sm text-red-500">{errors.nama_masjid}</p>}
                                 </div>
 
                                 <div>
                                     <Label htmlFor="alamat_masjid">Alamat Masjid *</Label>
                                     <div className="relative">
-                                        <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                        <MapPin className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
                                         <Textarea
                                             id="alamat_masjid"
                                             value={data.alamat_masjid}
                                             onChange={(e) => setData('alamat_masjid', e.target.value)}
                                             placeholder="Jl. Contoh No. 123, Kelurahan, Kecamatan, Kota"
                                             rows={3}
-                                            className={`pl-10 resize-none ${errors.alamat_masjid ? 'border-red-500' : ''}`}
+                                            className={`resize-none pl-10 ${errors.alamat_masjid ? 'border-red-500' : ''}`}
                                         />
                                     </div>
-                                    {errors.alamat_masjid && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.alamat_masjid}</p>
-                                    )}
+                                    {errors.alamat_masjid && <p className="mt-1 text-sm text-red-500">{errors.alamat_masjid}</p>}
                                 </div>
 
                                 <div>
@@ -322,9 +310,7 @@ export default function EditKunjungan() {
                                         placeholder="Nama ketua takmir atau pengurus"
                                         className={errors.nama_pengurus ? 'border-red-500' : ''}
                                     />
-                                    {errors.nama_pengurus && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.nama_pengurus}</p>
-                                    )}
+                                    {errors.nama_pengurus && <p className="mt-1 text-sm text-red-500">{errors.nama_pengurus}</p>}
                                 </div>
 
                                 <div>
@@ -336,16 +322,14 @@ export default function EditKunjungan() {
                                         placeholder="10 shof"
                                         className={errors.jumlah_shof ? 'border-red-500' : ''}
                                     />
-                                    {errors.jumlah_shof && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.jumlah_shof}</p>
-                                    )}
+                                    {errors.jumlah_shof && <p className="mt-1 text-sm text-red-500">{errors.jumlah_shof}</p>}
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
                     {/* Photo Upload */}
-                    <Card className="border-border/50 shadow-soft">
+                    <Card className="shadow-soft border-border/50">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Camera className="h-5 w-5" />
@@ -355,30 +339,35 @@ export default function EditKunjungan() {
                         <CardContent>
                             {/* Current Photo */}
                             {kunjungan.foto_masjid && (
-                                <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                                    <h4 className="font-medium mb-2">Foto saat ini:</h4>
-                                    <div className="flex items-center gap-3">
-                                        <Camera className="h-5 w-5 text-muted-foreground" />
-                                        <div className="flex-1">
-                                            <p className="font-medium">Foto tersimpan</p>
-                                            <a 
-                                                href={`/storage/${kunjungan.foto_masjid}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm text-brand-primary hover:text-brand-primary-dark flex items-center gap-1"
-                                            >
-                                                <Eye className="h-3 w-3" />
-                                                Lihat foto
+                                <Card className="shadow-soft border-border/50 bg-muted">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Camera className="h-5 w-5" />
+                                            Foto Saat Ini
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="overflow-hidden rounded-lg bg-muted/50">
+                                            <img
+                                                src={`/kunjungans/${kunjungan.id}/image`}
+                                                alt={`Foto ${kunjungan.nama_masjid}`}
+                                                className="h-auto max-h-96 w-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex justify-center">
+                                            <a href={`/kunjungans/${kunjungan.id}/download-image`} download>
+                                                <Button variant="outline" size="sm">
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    Download Foto
+                                                </Button>
                                             </a>
                                         </div>
-                                    </div>
-                                </div>
+                                    </CardContent>
+                                </Card>
                             )}
-                            
+
                             <div>
-                                <Label htmlFor="foto_masjid">
-                                    {kunjungan.foto_masjid ? 'Ganti Foto Masjid' : 'Foto Masjid'}
-                                </Label>
+                                <Label htmlFor="foto_masjid">{kunjungan.foto_masjid ? 'Ganti Foto Masjid' : 'Foto Masjid'}</Label>
                                 <div className="mt-2">
                                     <Input
                                         id="foto_masjid"
@@ -390,20 +379,16 @@ export default function EditKunjungan() {
                                     <div className="mt-2 space-y-1 text-xs text-muted-foreground">
                                         <p>Format yang didukung: JPG, JPEG, PNG</p>
                                         <p>Maksimal ukuran file: 10MB</p>
-                                        {kunjungan.foto_masjid && (
-                                            <p>Kosongkan jika tidak ingin mengubah foto</p>
-                                        )}
+                                        {kunjungan.foto_masjid && <p>Kosongkan jika tidak ingin mengubah foto</p>}
                                     </div>
                                 </div>
-                                {errors.foto_masjid && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.foto_masjid}</p>
-                                )}
+                                {errors.foto_masjid && <p className="mt-1 text-sm text-red-500">{errors.foto_masjid}</p>}
                             </div>
 
                             {/* New File Preview */}
                             {selectedFile && (
-                                <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-                                    <h4 className="font-medium mb-2">File baru yang dipilih:</h4>
+                                <div className="mt-4 rounded-lg bg-muted/50 p-3">
+                                    <h4 className="mb-2 font-medium">File baru yang dipilih:</h4>
                                     <div className="flex items-center gap-3">
                                         <Camera className="h-5 w-5 text-muted-foreground" />
                                         <div className="flex-1">
@@ -414,9 +399,7 @@ export default function EditKunjungan() {
                                         </div>
                                     </div>
                                     {selectedFile.size > maxFileSize && (
-                                        <p className="text-sm text-red-500 mt-2">
-                                            ⚠️ File terlalu besar! Maksimal 10MB.
-                                        </p>
+                                        <p className="mt-2 text-sm text-red-500">⚠️ File terlalu besar! Maksimal 10MB.</p>
                                     )}
                                 </div>
                             )}
@@ -424,7 +407,7 @@ export default function EditKunjungan() {
                     </Card>
 
                     {/* Additional Details */}
-                    <Card className="border-border/50 shadow-soft">
+                    <Card className="shadow-soft border-border/50">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <FileText className="h-5 w-5" />
@@ -442,9 +425,7 @@ export default function EditKunjungan() {
                                     rows={3}
                                     className={errors.kondisi_karpet ? 'border-red-500' : ''}
                                 />
-                                {errors.kondisi_karpet && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.kondisi_karpet}</p>
-                                )}
+                                {errors.kondisi_karpet && <p className="mt-1 text-sm text-red-500">{errors.kondisi_karpet}</p>}
                             </div>
 
                             <div>
@@ -457,9 +438,7 @@ export default function EditKunjungan() {
                                     rows={3}
                                     className={errors.kebutuhan ? 'border-red-500' : ''}
                                 />
-                                {errors.kebutuhan && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.kebutuhan}</p>
-                                )}
+                                {errors.kebutuhan && <p className="mt-1 text-sm text-red-500">{errors.kebutuhan}</p>}
                             </div>
 
                             <div>
@@ -472,16 +451,14 @@ export default function EditKunjungan() {
                                     rows={3}
                                     className={errors.catatan ? 'border-red-500' : ''}
                                 />
-                                {errors.catatan && (
-                                    <p className="text-sm text-red-500 mt-1">{errors.catatan}</p>
-                                )}
+                                {errors.catatan && <p className="mt-1 text-sm text-red-500">{errors.catatan}</p>}
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Dynamic Items */}
                     {itemCategories && itemCategories.length > 0 && (
-                        <Card className="border-border/50 shadow-soft">
+                        <Card className="shadow-soft border-border/50">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Settings className="h-5 w-5" />
@@ -492,42 +469,46 @@ export default function EditKunjungan() {
                                 {itemCategories.map((category) => (
                                     <div key={category.id} className="space-y-3">
                                         <div className="border-b pb-2">
-                                            <h4 className="font-medium text-brand-primary">{category.nama}</h4>
-                                            {category.deskripsi && (
-                                                <p className="text-sm text-muted-foreground">{category.deskripsi}</p>
-                                            )}
+                                            <h4 className="text-brand-primary font-medium">{category.nama}</h4>
+                                            {category.deskripsi && <p className="text-sm text-muted-foreground">{category.deskripsi}</p>}
                                         </div>
 
                                         {category.input_type === 'radio' ? (
                                             <RadioGroup
-                                                value={Object.keys(data.item_responses).find(key => 
-                                                    category.active_kunjungan_items.some(item => item.id.toString() === key)
-                                                ) || ''}
+                                                value={
+                                                    Object.keys(data.item_responses).find((key) =>
+                                                        category.active_kunjungan_items.some((item) => item.id.toString() === key),
+                                                    ) || ''
+                                                }
                                                 onValueChange={(itemId) => {
                                                     if (itemId) {
                                                         handleItemResponse(parseInt(itemId), 'ada', 'radio');
                                                     }
                                                 }}
-                                                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                                className="grid grid-cols-1 gap-3 sm:grid-cols-2"
                                             >
                                                 {category.active_kunjungan_items.map((item) => (
-                                                    <div key={item.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50">
+                                                    <div
+                                                        key={item.id}
+                                                        className="flex items-center space-x-3 rounded-lg border p-3 hover:bg-muted/50"
+                                                    >
                                                         <RadioGroupItem value={item.id.toString()} id={`radio-${item.id}`} />
                                                         <div className="flex-1">
-                                                            <Label htmlFor={`radio-${item.id}`} className="font-medium cursor-pointer">
+                                                            <Label htmlFor={`radio-${item.id}`} className="cursor-pointer font-medium">
                                                                 {item.nama}
                                                             </Label>
-                                                            {item.deskripsi && (
-                                                                <p className="text-xs text-muted-foreground">{item.deskripsi}</p>
-                                                            )}
+                                                            {item.deskripsi && <p className="text-xs text-muted-foreground">{item.deskripsi}</p>}
                                                         </div>
                                                     </div>
                                                 ))}
                                             </RadioGroup>
                                         ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                                 {category.active_kunjungan_items.map((item) => (
-                                                    <div key={item.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50">
+                                                    <div
+                                                        key={item.id}
+                                                        className="flex items-center space-x-3 rounded-lg border p-3 hover:bg-muted/50"
+                                                    >
                                                         <div className="flex items-center space-x-2">
                                                             <Checkbox
                                                                 id={`checkbox-${item.id}`}
@@ -542,15 +523,13 @@ export default function EditKunjungan() {
                                                                     }
                                                                 }}
                                                             />
-                                                            <Label htmlFor={`checkbox-${item.id}`} className="text-sm font-medium cursor-pointer">
+                                                            {/* <Label htmlFor={`checkbox-${item.id}`} className="text-sm font-medium cursor-pointer">
                                                                 Ada
-                                                            </Label>
+                                                            </Label> */}
                                                         </div>
                                                         <div className="flex-1">
                                                             <div className="font-medium">{item.nama}</div>
-                                                            {item.deskripsi && (
-                                                                <p className="text-xs text-muted-foreground">{item.deskripsi}</p>
-                                                            )}
+                                                            {item.deskripsi && <p className="text-xs text-muted-foreground">{item.deskripsi}</p>}
                                                         </div>
                                                     </div>
                                                 ))}
@@ -563,9 +542,9 @@ export default function EditKunjungan() {
                     )}
 
                     {/* Submit */}
-                    <Card className="border-border/50 shadow-soft">
+                    <Card className="shadow-soft border-border/50">
                         <CardContent className="pt-6">
-                            <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex flex-col gap-4 sm:flex-row">
                                 <Button
                                     type="button"
                                     variant="outline"

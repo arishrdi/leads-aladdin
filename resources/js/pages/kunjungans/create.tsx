@@ -6,11 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { DatePicker } from '@/components/ui/date-picker';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, MapPin, Phone, User, Building, Camera, FileText, Settings } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
+import { format } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -50,6 +52,8 @@ interface PageProps {
 export default function CreateKunjungan() {
     const { cabangs, itemCategories, config } = usePage<PageProps>().props;
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
     const { data, setData, post, processing, errors } = useForm({
         cabang_id: cabangs.length === 1 ? cabangs[0].id.toString() : '',
@@ -174,16 +178,17 @@ export default function CreateKunjungan() {
 
                                 <div>
                                     <Label htmlFor="waktu_canvasing">Waktu Canvasing *</Label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input
-                                            id="waktu_canvasing"
-                                            type="date"
-                                            value={data.waktu_canvasing}
-                                            onChange={(e) => setData('waktu_canvasing', e.target.value)}
-                                            className={`pl-10 ${errors.waktu_canvasing ? 'border-red-500' : ''}`}
-                                        />
-                                    </div>
+                                    <DatePicker
+                                        date={selectedDate}
+                                        onDateChange={(date) => {
+                                            if (date) {
+                                                setSelectedDate(date);
+                                                setData('waktu_canvasing', format(date, 'yyyy-MM-dd'));
+                                            }
+                                        }}
+                                        placeholder="Pilih tanggal kunjungan"
+                                        className={errors.waktu_canvasing ? 'border-red-500' : ''}
+                                    />
                                     {errors.waktu_canvasing && (
                                         <p className="text-sm text-red-500 mt-1">{errors.waktu_canvasing}</p>
                                     )}

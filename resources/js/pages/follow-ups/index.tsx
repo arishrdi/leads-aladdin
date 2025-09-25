@@ -55,6 +55,13 @@ interface Statistics {
 }
 
 interface PageProps {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            role: string;
+        };
+    };
     todaysFollowUps: FollowUp[];
     overdueFollowUps: FollowUp[];
     successfulFollowUps: FollowUp[];
@@ -70,7 +77,7 @@ interface PageProps {
 }
 
 export default function FollowUpsIndex() {
-    const { todaysFollowUps, overdueFollowUps, successfulFollowUps, allFollowUps, statistics, filters, config } = usePage<PageProps>().props;
+    const { auth, todaysFollowUps, overdueFollowUps, successfulFollowUps, allFollowUps, statistics, filters, config } = usePage<PageProps>().props;
     
     // State for date range picker
     const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
@@ -159,14 +166,24 @@ export default function FollowUpsIndex() {
 
     const hasDateFilter = filters.start_date || filters.end_date;
 
+    // Check user role for button customization
+    const isSuperUser = auth.user.role === 'super_user';
+    const isSupervisor = auth.user.role === 'supervisor';
+    const canStartFollowup = auth.user.role === 'marketing';
+    
     // Component for rendering follow-up items
-    const FollowUpItem = ({ followUp, showFullDate = false, buttonText = "Mulai Follow-up", buttonColor = "bg-brand-primary hover:bg-brand-primary-dark", showCompletedTime = false }: { 
+    const FollowUpItem = ({ followUp, showFullDate = false, buttonText, buttonColor = "bg-brand-primary hover:bg-brand-primary-dark", showCompletedTime = false }: { 
         followUp: FollowUp; 
         showFullDate?: boolean; 
         buttonText?: string;
         buttonColor?: string;
         showCompletedTime?: boolean;
-    }) => (
+    }) => {
+        // Determine button text based on user role if not explicitly provided
+        const defaultButtonText = canStartFollowup ? "Mulai Follow-up" : "Lihat Detail";
+        const actualButtonText = buttonText || defaultButtonText;
+        
+        return (
         <div className="p-4 rounded-lg bg-card border border-border/50 shadow-soft hover:shadow-soft-md transition-all duration-200">
             <div className="space-y-4">
                 {/* Header */}
@@ -287,13 +304,14 @@ export default function FollowUpsIndex() {
                     </a>
                     <Link href={`/follow-ups/${followUp.id}`} className="flex-1">
                         <Button className={`w-full touch-target ${buttonColor} transition-colors`}>
-                            {buttonText}
+                            {actualButtonText}
                         </Button>
                     </Link>
                 </div>
             </div>
         </div>
-    );
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

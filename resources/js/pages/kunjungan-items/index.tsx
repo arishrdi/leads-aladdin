@@ -291,40 +291,7 @@ export default function KunjunganItemsIndex() {
                     )}
                 </div>
 
-                {/* Info Card */}
-                <Card className="border-border/50 shadow-soft bg-blue-50/50 dark:bg-blue-950/20">
-                    <CardHeader>
-                        <CardTitle className="text-blue-800 dark:text-blue-200">
-                            Informasi Pengelolaan Item
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                            <div>
-                                <h4 className="font-medium mb-2 text-blue-800 dark:text-blue-200">
-                                    Tentang Kategori:
-                                </h4>
-                                <ul className="space-y-1 text-blue-700 dark:text-blue-300">
-                                    <li>• Setiap kategori memiliki tipe input (Radio/Checkbox)</li>
-                                    <li>• Radio: Pilih satu item saja</li>
-                                    <li>• Checkbox: Pilih beberapa item</li>
-                                    <li>• Urutan kategori menentukan urutan di formulir</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="font-medium mb-2 text-blue-800 dark:text-blue-200">
-                                    Tentang Item:
-                                </h4>
-                                <ul className="space-y-1 text-blue-700 dark:text-blue-300">
-                                    <li>• Setiap item dalam kategori akan ditampilkan sebagai pilihan</li>
-                                    <li>• Marketing dapat memilih "Ada" atau "Belum Ada"</li>
-                                    <li>• Urutan item menentukan urutan dalam kategori</li>
-                                    <li>• Item nonaktif tidak akan muncul di formulir</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+               
             </div>
         </AppLayout>
     );
