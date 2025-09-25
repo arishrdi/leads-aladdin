@@ -18,7 +18,7 @@ class CabangController extends Controller
     {
         $this->authorize('viewAny', Cabang::class);
 
-        $cabangs = Cabang::withCount(['users', 'leads'])
+        $cabangs = Cabang::withCount(['users', 'leads', 'kunjungan'])
             ->with(['users' => function($query) {
                 $query->select('users.id', 'name', 'email', 'role')->where('users.is_active', true);
             }])

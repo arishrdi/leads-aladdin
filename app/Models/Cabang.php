@@ -38,4 +38,8 @@ class Cabang extends Model
     {
         return $this->hasMany(Leads::class);
     }
+    public function kunjungan(): HasMany
+    {
+        return $this->hasMany(Kunjungan::class);
+    }
 }
