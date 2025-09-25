@@ -5,7 +5,7 @@ import { BranchSelector } from '@/components/branch-selector';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Users, Building, Calendar, FileText, Settings, BarChart3, Phone, UserCog, Database, FolderOpen } from 'lucide-react';
+import { LayoutGrid, Users, Building, Calendar, FileText, Settings, BarChart3, Phone, UserCog, Database, FolderOpen, MapPin } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const getMainNavItems = (user: User): NavItem[] => {
@@ -19,6 +19,11 @@ const getMainNavItems = (user: User): NavItem[] => {
             title: 'Leads',
             href: '/leads',
             icon: Users,
+        },
+        {
+            title: 'Kunjungan',
+            href: '/kunjungans',
+            icon: MapPin,
         },
         {
             title: 'Follow-ups',
@@ -59,6 +64,11 @@ const getMainNavItems = (user: User): NavItem[] => {
                 title: 'Tahap Follow-up',
                 href: '/follow-up-stages',
                 icon: Database,
+            },
+            {
+                title: 'Kelola Item Kunjungan',
+                href: '/kunjungan-items',
+                icon: Settings,
             },
             {
                 title: 'Reports',

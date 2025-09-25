@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\FollowUpStageController;
+use App\Http\Controllers\KunjunganController;
+use App\Http\Controllers\KunjunganItemController;
 use App\Http\Controllers\LeadsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SumberLeadsController;
@@ -22,6 +24,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Leads Management
     Route::resource('leads', LeadsController::class);
+    
+    // Kunjungan Management
+    Route::resource('kunjungans', KunjunganController::class);
+    Route::get('kunjungans/{kunjungan}/image', [KunjunganController::class, 'image'])->name('kunjungans.image');
+    Route::get('kunjungans/{kunjungan}/download-image', [KunjunganController::class, 'downloadImage'])->name('kunjungans.download-image');
     
     // Follow-ups Management
     Route::get('follow-ups', [FollowUpController::class, 'index'])->name('follow-ups.index');
@@ -57,6 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('tipe-karpets', TipeKarpetController::class);
     Route::resource('follow-up-stages', FollowUpStageController::class);
     Route::patch('follow-up-stages-order', [FollowUpStageController::class, 'updateOrder'])->name('follow-up-stages.update-order');
+    Route::resource('kunjungan-items', KunjunganItemController::class);
 });
 
 require __DIR__.'/settings.php';

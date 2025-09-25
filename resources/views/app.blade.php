@@ -7,6 +7,9 @@
         {{-- Inline script to prevent theme flash - matches theme-toggle.tsx logic --}}
         <script>
             (function() {
+
+                console.log('%cPowered by IT Solution', 'color: red')
+
                 try {
                     // Use the same localStorage key as our theme toggle component
                     const theme = localStorage.getItem('theme') || 'system';
@@ -36,7 +39,7 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'Leads Aladdin') }}</title>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">

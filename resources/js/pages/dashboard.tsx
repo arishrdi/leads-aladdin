@@ -150,8 +150,6 @@ export default function Dashboard() {
     const isMarketing = auth.user.role === 'marketing';
     const canViewAnalytics = auth.user.role === 'supervisor' || auth.user.role === 'super_user';
     const isSuperUser = auth.user.role === 'super_user';
-
-    console.log("User role", auth.user.role)
     
     // Comparison Mode State
     const [comparisonMode, setComparisonMode] = useState(false);
