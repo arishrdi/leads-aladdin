@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { ArrowLeft, Building, Calendar, Camera, Download, FileText, MapPin, Phone, Settings, User } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import { format, parseISO } from 'date-fns';
@@ -85,7 +85,7 @@ export default function EditKunjungan() {
     });
 
     const { data, setData, patch, processing, errors } = useForm({
-        cabang_id: kunjungan.cabang_id.toString(),
+        cabang_id: kunjungan.cabang_id,
         waktu_canvasing: kunjungan.waktu_canvasing,
         bertemu_dengan: kunjungan.bertemu_dengan,
         nomor_aktif_takmir: kunjungan.nomor_aktif_takmir,
@@ -103,8 +103,45 @@ export default function EditKunjungan() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        patch(`/kunjungans/${kunjungan.id}`, {
+        
+        // Use POST with method spoofing for file uploads
+        const formData = new FormData();
+        
+        // Add all form fields
+        formData.append('_method', 'PATCH');
+        formData.append('cabang_id', data.cabang_id.toString());
+        formData.append('waktu_canvasing', data.waktu_canvasing);
+        formData.append('bertemu_dengan', data.bertemu_dengan);
+        formData.append('nomor_aktif_takmir', data.nomor_aktif_takmir);
+        formData.append('nama_masjid', data.nama_masjid);
+        formData.append('alamat_masjid', data.alamat_masjid);
+        formData.append('nama_pengurus', data.nama_pengurus);
+        formData.append('jumlah_shof', data.jumlah_shof);
+        formData.append('kondisi_karpet', data.kondisi_karpet);
+        formData.append('status', data.status);
+        formData.append('kebutuhan', data.kebutuhan);
+        formData.append('catatan', data.catatan);
+        
+        // Add file if selected
+        if (data.foto_masjid) {
+            formData.append('foto_masjid', data.foto_masjid);
+        }
+        
+        // Add item responses
+        Object.entries(data.item_responses).forEach(([itemId, status]) => {
+            formData.append(`item_responses[${itemId}]`, status);
+        });
+        
+        // Use router.post method with FormData
+        router.post(`/kunjungans/${kunjungan.id}`, formData, {
             forceFormData: true,
+            onSuccess: () => {
+                // Handle success if needed
+            },
+            onError: (errors) => {
+                // Handle errors if needed
+                console.error('Form submission errors:', errors);
+            }
         });
     };
 
@@ -183,7 +220,7 @@ export default function EditKunjungan() {
                                 {cabangs.length > 1 && (
                                     <div>
                                         <Label htmlFor="cabang_id">Cabang *</Label>
-                                        <Select value={data.cabang_id} onValueChange={(value) => setData('cabang_id', value)}>
+                                        <Select value={data.cabang_id.toString()} onValueChange={(value) => setData('cabang_id', parseInt(value))}>
                                             <SelectTrigger className={errors.cabang_id ? 'border-red-500' : ''}>
                                                 <SelectValue placeholder="Pilih cabang" />
                                             </SelectTrigger>
