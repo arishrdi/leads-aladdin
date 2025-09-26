@@ -95,7 +95,7 @@ export default function ShowUser() {
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-bold text-[#2B5235]">{user.name}</h1>
+                            <h1 className="text-2xl font-bold text-brand-primary">{user.name}</h1>
                             <p className="text-gray-600 flex items-center gap-2">
                                 <Mail className="h-4 w-4" />
                                 {user.email}
@@ -214,7 +214,7 @@ export default function ShowUser() {
                                                 <div key={cabang.id} className="p-3 border rounded-lg">
                                                     <div className="flex items-center justify-between">
                                                         <div>
-                                                            <p className="font-medium text-[#2B5235]">{cabang.nama_cabang}</p>
+                                                            <p className="font-medium text-brand-primary">{cabang.nama_cabang}</p>
                                                             <p className="text-sm text-gray-600">{cabang.lokasi}</p>
                                                         </div>
                                                         <Link href={`/cabangs/${cabang.id}`}>
@@ -265,7 +265,7 @@ export default function ShowUser() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {user.leads_count !== undefined && (
                                     <div className="text-center p-4 border rounded-lg">
-                                        <div className="text-2xl font-bold text-[#2B5235]">
+                                        <div className="text-2xl font-bold text-brand-primary">
                                             {user.leads_count}
                                         </div>
                                         <div className="text-sm text-gray-600">Total Leads</div>
@@ -298,7 +298,7 @@ export default function ShowUser() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Timeline:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Timeline:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Akun dibuat: {new Date(user.created_at).toLocaleString('id-ID')}</li>
                                     <li>• Terakhir diperbarui: {new Date(user.updated_at).toLocaleString('id-ID')}</li>
@@ -306,7 +306,7 @@ export default function ShowUser() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Status:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Status:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Status akun: {user.is_active ? 'Aktif' : 'Nonaktif'}</li>
                                     <li>• Role: {getRoleDisplayName(user.role)}</li>

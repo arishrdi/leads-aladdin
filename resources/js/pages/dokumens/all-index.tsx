@@ -131,7 +131,7 @@ export default function AllDokumensIndex() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Semua Dokumen</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Semua Dokumen</h1>
                         <p className="text-gray-600">
                             {dokumens.total} dokumen total
                         </p>
@@ -172,7 +172,7 @@ export default function AllDokumensIndex() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-4 mb-3">
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-semibold text-[#2B5235] truncate">
+                                                    <h3 className="font-semibold text-brand-primary truncate">
                                                         {dokumen.judul}
                                                     </h3>
                                                     {dokumen.deskripsi && (
@@ -209,7 +209,7 @@ export default function AllDokumensIndex() {
                                                             href={`https://wa.me/${dokumen.leads.no_whatsapp}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-[#2B5235] hover:underline"
+                                                            className="text-brand-primary hover:underline"
                                                         >
                                                             {formatPhoneNumber(dokumen.leads.no_whatsapp)}
                                                         </a>
@@ -345,7 +345,7 @@ export default function AllDokumensIndex() {
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                                 <div>
-                                    <div className="text-2xl font-bold text-[#2B5235]">
+                                    <div className="text-2xl font-bold text-brand-primary">
                                         {dokumens.total}
                                     </div>
                                     <div className="text-sm text-gray-500">Total Dokumen</div>

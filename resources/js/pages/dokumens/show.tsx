@@ -108,7 +108,7 @@ export default function ShowDokumen() {
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-bold text-[#2B5235]">Detail Dokumen</h1>
+                            <h1 className="text-2xl font-bold text-brand-primary">Detail Dokumen</h1>
                             <p className="text-gray-600">{dokumen.judul}</p>
                         </div>
                     </div>
@@ -219,7 +219,7 @@ export default function ShowDokumen() {
                                 <div className="flex gap-2">
                                     <a 
                                         href={`tel:${dokumen.leads.no_whatsapp}`}
-                                        className="text-[#2B5235] hover:underline font-medium"
+                                        className="text-brand-primary hover:underline font-medium"
                                     >
                                         {formatPhoneNumber(dokumen.leads.no_whatsapp)}
                                     </a>
@@ -228,7 +228,7 @@ export default function ShowDokumen() {
                                         href={`https://wa.me/${dokumen.leads.no_whatsapp}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[#2B5235] hover:underline"
+                                        className="text-brand-primary hover:underline"
                                     >
                                         WhatsApp
                                     </a>

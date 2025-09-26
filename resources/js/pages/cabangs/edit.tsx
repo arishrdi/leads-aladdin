@@ -76,7 +76,7 @@ export default function EditCabang() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Edit Cabang</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Edit Cabang</h1>
                         <p className="text-gray-600">
                             Perbarui informasi cabang {cabang.nama_cabang}
                         </p>
@@ -278,7 +278,7 @@ export default function EditCabang() {
                             </div>
                             <div className="p-3 bg-gray-50 rounded-lg">
                                 <p className="font-medium text-gray-700">Tim Marketing</p>
-                                <p className="text-lg font-bold text-[#2B5235]">
+                                <p className="text-lg font-bold text-brand-primary">
                                     {cabang.users.length} orang
                                 </p>
                             </div>

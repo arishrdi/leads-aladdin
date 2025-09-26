@@ -68,7 +68,7 @@ export default function EditFollowUpStage() {
                         </Link>
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Edit Tahap Follow-up</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Edit Tahap Follow-up</h1>
                         <p className="text-gray-600">Edit tahap: {stage.name}</p>
                     </div>
                 </div>

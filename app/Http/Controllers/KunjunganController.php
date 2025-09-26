@@ -169,6 +169,9 @@ class KunjunganController extends Controller
                 Storage::disk('public')->delete($kunjungan->foto_masjid);
             }
             $validated['foto_masjid'] = $request->file('foto_masjid')->store('kunjungans', 'public');
+        } else {
+            // Remove foto_masjid from validated data if no file uploaded
+            unset($validated['foto_masjid']);
         }
 
         $kunjungan->update($validated);

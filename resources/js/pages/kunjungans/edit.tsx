@@ -75,6 +75,7 @@ export default function EditKunjungan() {
     const { kunjungan, cabangs, itemCategories, config } = usePage<PageProps>().props;
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [selectedDate, setSelectedDate] = useState<Date>(parseISO(kunjungan.waktu_canvasing));
+    const [imageVersion, setImageVersion] = useState<number>(Date.now());
 
     // Build initial item responses from existing data
     const initialItemResponses: Record<string, string> = {};
@@ -104,45 +105,53 @@ export default function EditKunjungan() {
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         
-        // Use POST with method spoofing for file uploads
-        const formData = new FormData();
-        
-        // Add all form fields
-        formData.append('_method', 'PATCH');
-        formData.append('cabang_id', data.cabang_id.toString());
-        formData.append('waktu_canvasing', data.waktu_canvasing);
-        formData.append('bertemu_dengan', data.bertemu_dengan);
-        formData.append('nomor_aktif_takmir', data.nomor_aktif_takmir);
-        formData.append('nama_masjid', data.nama_masjid);
-        formData.append('alamat_masjid', data.alamat_masjid);
-        formData.append('nama_pengurus', data.nama_pengurus);
-        formData.append('jumlah_shof', data.jumlah_shof);
-        formData.append('kondisi_karpet', data.kondisi_karpet);
-        formData.append('status', data.status);
-        formData.append('kebutuhan', data.kebutuhan);
-        formData.append('catatan', data.catatan);
-        
-        // Add file if selected
+        // If there's a file upload, use FormData with POST method spoofing
         if (data.foto_masjid) {
+            const formData = new FormData();
+            
+            // Add method spoofing for PATCH
+            formData.append('_method', 'PATCH');
+            formData.append('cabang_id', data.cabang_id.toString());
+            formData.append('waktu_canvasing', data.waktu_canvasing);
+            formData.append('bertemu_dengan', data.bertemu_dengan);
+            formData.append('nomor_aktif_takmir', data.nomor_aktif_takmir);
+            formData.append('nama_masjid', data.nama_masjid);
+            formData.append('alamat_masjid', data.alamat_masjid);
+            formData.append('nama_pengurus', data.nama_pengurus);
+            formData.append('jumlah_shof', data.jumlah_shof);
+            formData.append('kondisi_karpet', data.kondisi_karpet);
+            formData.append('status', data.status);
+            formData.append('kebutuhan', data.kebutuhan);
+            formData.append('catatan', data.catatan);
             formData.append('foto_masjid', data.foto_masjid);
+            
+            // Add item responses
+            Object.entries(data.item_responses).forEach(([itemId, status]) => {
+                formData.append(`item_responses[${itemId}]`, status);
+            });
+            
+            // Use router.post with FormData for file upload
+            router.post(`/kunjungans/${kunjungan.id}`, formData, {
+                forceFormData: true,
+                onSuccess: () => {
+                    // Update image version to force re-render of the image
+                    setImageVersion(Date.now());
+                },
+                onError: (errors) => {
+                    console.error('Form submission errors:', errors);
+                }
+            });
+        } else {
+            // No file upload, use regular PATCH method
+            patch(`/kunjungans/${kunjungan.id}`, {
+                onSuccess: () => {
+                    // Handle success if needed
+                },
+                onError: (errors) => {
+                    console.error('Form submission errors:', errors);
+                }
+            });
         }
-        
-        // Add item responses
-        Object.entries(data.item_responses).forEach(([itemId, status]) => {
-            formData.append(`item_responses[${itemId}]`, status);
-        });
-        
-        // Use router.post method with FormData
-        router.post(`/kunjungans/${kunjungan.id}`, formData, {
-            forceFormData: true,
-            onSuccess: () => {
-                // Handle success if needed
-            },
-            onError: (errors) => {
-                // Handle errors if needed
-                console.error('Form submission errors:', errors);
-            }
-        });
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -386,7 +395,7 @@ export default function EditKunjungan() {
                                     <CardContent className="space-y-4">
                                         <div className="overflow-hidden rounded-lg bg-muted/50">
                                             <img
-                                                src={`/kunjungans/${kunjungan.id}/image`}
+                                                src={`/kunjungans/${kunjungan.id}/image?v=${imageVersion}`}
                                                 alt={`Foto ${kunjungan.nama_masjid}`}
                                                 className="h-auto max-h-96 w-full object-cover"
                                             />

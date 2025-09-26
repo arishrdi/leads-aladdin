@@ -154,7 +154,7 @@ export default function ExcelViewFollowUps() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235] flex items-center gap-2">
+                        <h1 className="text-2xl font-bold text-brand-primary flex items-center gap-2">
                             <FileSpreadsheet className="h-6 w-6" />
                             Excel View Follow-ups
                         </h1>
@@ -218,7 +218,7 @@ export default function ExcelViewFollowUps() {
                                         <tr key={lead.id} className="hover:bg-gray-50">
                                             <td className="border border-gray-300 px-2 py-2 sticky left-0 bg-white z-10">
                                                 <div className="min-w-[200px]">
-                                                    <div className="font-medium text-[#2B5235]">
+                                                    <div className="font-medium text-brand-primary">
                                                         {lead.nama_pelanggan}
                                                     </div>
                                                     <div className="text-xs text-gray-600">
@@ -280,7 +280,7 @@ export default function ExcelViewFollowUps() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card>
                         <CardContent className="p-4 text-center">
-                            <div className="text-2xl font-bold text-[#2B5235]">
+                            <div className="text-2xl font-bold text-brand-primary">
                                 {filteredLeads.length}
                             </div>
                             <div className="text-sm text-gray-500">Total Leads</div>

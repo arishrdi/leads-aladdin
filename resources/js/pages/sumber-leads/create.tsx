@@ -40,7 +40,7 @@ export default function CreateSumberLeads() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Tambah Sumber Leads Baru</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Tambah Sumber Leads Baru</h1>
                         <p className="text-gray-600">
                             Buat sumber leads baru untuk mengkategorikan asal leads
                         </p>
@@ -133,7 +133,7 @@ export default function CreateSumberLeads() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Contoh Sumber Leads:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Contoh Sumber Leads:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Media sosial (Instagram, Facebook, TikTok)</li>
                                     <li>• Referensi dari customer lama</li>
@@ -144,7 +144,7 @@ export default function CreateSumberLeads() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Tips Pengelolaan:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Tips Pengelolaan:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Gunakan nama yang jelas dan mudah dipahami</li>
                                     <li>• Tambahkan deskripsi untuk detail tambahan</li>

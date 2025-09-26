@@ -56,7 +56,7 @@ export default function EditTipeKarpet() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Edit Tipe Karpet: {tipeKarpet.nama}</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Edit Tipe Karpet: {tipeKarpet.nama}</h1>
                         <p className="text-gray-600">
                             Perbarui informasi tipe karpet
                         </p>
@@ -115,7 +115,7 @@ export default function EditTipeKarpet() {
                             <div className="pt-4 border-t border-gray-200">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                        <div className="text-lg font-bold text-[#2B5235]">
+                                        <div className="text-lg font-bold text-brand-primary">
                                             {tipeKarpet.leads_count || 0}
                                         </div>
                                         <div className="text-xs text-gray-500">Total Leads</div>
@@ -196,7 +196,7 @@ export default function EditTipeKarpet() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Perubahan Nama:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Perubahan Nama:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Akan mempengaruhi tampilan di semua leads</li>
                                     <li>• Data historis tetap tersimpan dengan aman</li>
@@ -204,7 +204,7 @@ export default function EditTipeKarpet() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Status Aktif/Nonaktif:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Status Aktif/Nonaktif:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Nonaktif: tidak muncul di form leads baru</li>
                                     <li>• Leads lama tetap mempertahankan tipe</li>

@@ -255,9 +255,9 @@ class DashboardController extends Controller
             $outletComparison = $allBranches;
         } elseif ($user->isSupervisor()) {
             // Get branches assigned to supervisor
-            $cabangs = $user->cabangs()->where('is_active', true)->get();
+            $cabangs = $user->cabangs()->where('user_cabangs.is_active', true)->get();
 
-            $outletComparison = $cabangs->map(function ($cabang) {
+            $allBranches = $cabangs->map(function ($cabang) {
                 $cabangLeads = Leads::where('cabang_id', $cabang->id)->where('is_active', true);
                 
                 $totalLeads = $cabangLeads->count();
@@ -266,6 +266,7 @@ class DashboardController extends Controller
                 $customers = (clone $cabangLeads)->where('status', 'CUSTOMER')->count();
                 $exitLeads = (clone $cabangLeads)->where('status', 'EXIT')->count();
                 $coldLeads = (clone $cabangLeads)->where('status', 'COLD')->count();
+                $crossSellingLeads = (clone $cabangLeads)->where('status', 'CROSS_SELLING')->count();
                 
                 $conversionRate = $totalLeads > 0 ? round(($customers / $totalLeads) * 100, 1) : 0;
                 
@@ -285,6 +286,46 @@ class DashboardController extends Controller
                     ->whereYear('tanggal_closing', Carbon::now()->year)
                     ->count();
 
+                // Follow-up stats for this branch
+                $todaysFollowups = FollowUp::whereHas('leads', function ($q) use ($cabang) {
+                        $q->where('cabang_id', $cabang->id);
+                    })
+                    ->whereDate('scheduled_at', Carbon::today())
+                    ->where('status', 'scheduled')
+                    ->count();
+                    
+                $overdueFollowups = FollowUp::whereHas('leads', function ($q) use ($cabang) {
+                        $q->where('cabang_id', $cabang->id);
+                    })
+                    ->where('scheduled_at', '<', Carbon::today())
+                    ->where('status', 'scheduled')
+                    ->count();
+
+                // Kunjungan stats for this branch
+                $cabangKunjungan = Kunjungan::where('cabang_id', $cabang->id)->where('is_active', true);
+                $totalKunjungan = $cabangKunjungan->count();
+                $activeKunjungan = (clone $cabangKunjungan)->whereIn('status', ['WARM', 'HOT'])->count();
+                $completedKunjungan = (clone $cabangKunjungan)->where('status', 'HOT')->count();
+                
+                $thisMonthKunjungan = (clone $cabangKunjungan)
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->count();
+
+                // Recent leads for this branch
+                $recentLeads = (clone $cabangLeads)
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get()
+                    ->map(function ($lead) {
+                        return [
+                            'id' => $lead->id,
+                            'nama_pelanggan' => $lead->nama_pelanggan,
+                            'status' => $lead->status,
+                            'tanggal_leads' => $lead->tanggal_leads->format('d M Y'),
+                        ];
+                    });
+
                 return [
                     'id' => $cabang->id,
                     'nama_cabang' => $cabang->nama_cabang,
@@ -297,14 +338,25 @@ class DashboardController extends Controller
                         'customers' => $customers,
                         'exit_leads' => $exitLeads,
                         'cold_leads' => $coldLeads,
+                        'cross_selling_leads' => $crossSellingLeads,
                         'conversion_rate' => $conversionRate,
                         'potential_revenue' => $potentialRevenue,
                         'deal_revenue' => $dealRevenue,
                         'this_month_leads' => $thisMonthLeads,
                         'this_month_customers' => $thisMonthCustomers,
-                    ]
+                        'todays_followups' => $todaysFollowups,
+                        'overdue_followups' => $overdueFollowups,
+                        'total_kunjungan' => $totalKunjungan,
+                        'active_kunjungan' => $activeKunjungan,
+                        'completed_kunjungan' => $completedKunjungan,
+                        'this_month_kunjungan' => $thisMonthKunjungan,
+                    ],
+                    'recent_leads' => $recentLeads
                 ];
             });
+            
+            // Set outlet comparison to current logic for backward compatibility
+            $outletComparison = $allBranches;
         }
 
         return Inertia::render('dashboard', [

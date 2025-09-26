@@ -105,7 +105,7 @@ export default function DokumensIndex() {
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-bold text-[#2B5235]">Dokumen Lead</h1>
+                            <h1 className="text-2xl font-bold text-brand-primary">Dokumen Lead</h1>
                             <p className="text-gray-600">
                                 {lead.sapaan} {lead.nama_pelanggan} • {dokumens.length} dokumen
                             </p>
@@ -148,7 +148,7 @@ export default function DokumensIndex() {
                                 <div className="flex gap-2">
                                     <a 
                                         href={`tel:${lead.no_whatsapp}`}
-                                        className="text-[#2B5235] hover:underline font-medium"
+                                        className="text-brand-primary hover:underline font-medium"
                                     >
                                         {formatPhoneNumber(lead.no_whatsapp)}
                                     </a>
@@ -157,7 +157,7 @@ export default function DokumensIndex() {
                                         href={`https://wa.me/${lead.no_whatsapp}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[#2B5235] hover:underline"
+                                        className="text-brand-primary hover:underline"
                                     >
                                         WhatsApp
                                     </a>
@@ -206,7 +206,7 @@ export default function DokumensIndex() {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between gap-4">
                                                     <div className="flex-1 min-w-0">
-                                                        <h3 className="font-semibold text-[#2B5235] truncate">
+                                                        <h3 className="font-semibold text-brand-primary truncate">
                                                             {dokumen.judul}
                                                         </h3>
                                                         {dokumen.deskripsi && (
@@ -300,7 +300,7 @@ export default function DokumensIndex() {
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                                 <div>
-                                    <div className="text-2xl font-bold text-[#2B5235]">
+                                    <div className="text-2xl font-bold text-brand-primary">
                                         {dokumens.length}
                                     </div>
                                     <div className="text-sm text-gray-500">Total Dokumen</div>

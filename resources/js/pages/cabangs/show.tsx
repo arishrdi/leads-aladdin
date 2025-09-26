@@ -98,7 +98,7 @@ export default function ShowCabang() {
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-bold text-[#2B5235] flex items-center gap-3">
+                            <h1 className="text-2xl font-bold text-brand-primary flex items-center gap-3">
                                 <Building className="h-6 w-6" />
                                 {cabang.nama_cabang}
                                 <Badge variant={cabang.is_active ? 'default' : 'secondary'}>
@@ -121,7 +121,7 @@ export default function ShowCabang() {
 
                 {/* Stats Cards - Leads */}
                 <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Leads</h2>
+                    <h2 className="text-lg font-semibold text-brand-primary mb-4">Statistik Leads</h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card>
                         <CardContent className="p-4">
@@ -169,11 +169,11 @@ export default function ShowCabang() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-[#DDBE75]/20 rounded-lg">
-                                    <DollarSign className="h-5 w-5 text-[#2B5235]" />
+                                    <DollarSign className="h-5 w-5 text-brand-primary" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Total Revenue</p>
-                                    <p className="text-lg font-bold text-[#2B5235]">
+                                    <p className="text-lg font-bold text-brand-primary">
                                         {formatCurrency(stats.total_revenue)}
                                     </p>
                                 </div>
@@ -185,7 +185,7 @@ export default function ShowCabang() {
 
                 {/* Kunjungan Stats */}
                 <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Kunjungan</h2>
+                    <h2 className="text-lg font-semibold text-brand-primary mb-4">Statistik Kunjungan</h2>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <Card>
                             <CardContent className="p-4">
@@ -267,7 +267,7 @@ export default function ShowCabang() {
                                     <span className="font-medium">Telepon:</span>
                                     <a 
                                         href={`tel:${cabang.no_telp}`}
-                                        className="text-[#2B5235] hover:underline"
+                                        className="text-brand-primary hover:underline"
                                     >
                                         {cabang.no_telp}
                                     </a>
@@ -299,7 +299,7 @@ export default function ShowCabang() {
                                         <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 bg-[#2B5235]/10 rounded-full flex items-center justify-center">
-                                                    <User className="h-4 w-4 text-[#2B5235]" />
+                                                    <User className="h-4 w-4 text-brand-primary" />
                                                 </div>
                                                 <div>
                                                     <p className="font-medium">{user.name}</p>
@@ -348,7 +348,7 @@ export default function ShowCabang() {
                                             <div className="flex items-center gap-3">
                                                 <Link 
                                                     href={`/leads/${lead.id}`}
-                                                    className="font-medium text-[#2B5235] hover:underline"
+                                                    className="font-medium text-brand-primary hover:underline"
                                                 >
                                                     {lead.nama_pelanggan}
                                                 </Link>

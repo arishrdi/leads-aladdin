@@ -55,7 +55,7 @@ export default function TipeKarpetsIndex() {
             <div className="space-y-6">
                 <div className="flex gap-4 lg:gap-0 lg:items-center justify-start lg:justify-between lg:flex-row flex-col">
                     <div className='w-full'>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Tipe Karpet</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Tipe Karpet</h1>
                         <p className="text-gray-600 mt-1">
                             Kelola jenis-jenis karpet yang tersedia
                         </p>
@@ -94,11 +94,11 @@ export default function TipeKarpetsIndex() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                    <Package className="h-5 w-5 text-[#2B5235]" />
+                                    <Package className="h-5 w-5 text-brand-primary" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Total Tipe Aktif</p>
-                                    <p className="text-2xl font-bold text-[#2B5235]">
+                                    <p className="text-2xl font-bold text-brand-primary">
                                         {activeTipeKarpets.length}
                                     </p>
                                 </div>
@@ -167,7 +167,7 @@ export default function TipeKarpetsIndex() {
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                                        <Package className="h-4 w-4 text-[#2B5235]" />
+                                                        <Package className="h-4 w-4 text-brand-primary" />
                                                     </div>
                                                     <div>
                                                         <span className="font-medium">{tipeKarpet.nama}</span>
@@ -187,7 +187,7 @@ export default function TipeKarpetsIndex() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-center">
-                                                    <div className="text-lg font-bold text-[#2B5235]">
+                                                    <div className="text-lg font-bold text-brand-primary">
                                                         {tipeKarpet.leads_count || 0}
                                                     </div>
                                                 </div>
@@ -255,10 +255,10 @@ export default function TipeKarpetsIndex() {
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                                <Package className="h-5 w-5 text-[#2B5235]" />
+                                                <Package className="h-5 w-5 text-brand-primary" />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-lg text-[#2B5235]">
+                                                <CardTitle className="text-lg text-brand-primary">
                                                     {tipeKarpet.nama}
                                                 </CardTitle>
                                                 <p className="text-sm text-gray-600">
@@ -286,7 +286,7 @@ export default function TipeKarpetsIndex() {
                                     {/* Stats */}
                                     <div className="grid grid-cols-2 gap-4 py-3 border-t border-gray-100">
                                         <div className="text-center">
-                                            <div className="text-lg font-bold text-[#2B5235]">
+                                            <div className="text-lg font-bold text-brand-primary">
                                                 {tipeKarpet.leads_count || 0}
                                             </div>
                                             <div className="text-xs text-gray-500">Total Leads</div>

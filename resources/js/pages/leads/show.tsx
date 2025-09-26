@@ -161,7 +161,7 @@ export default function ShowLead() {
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-bold text-[#2B5235]">
+                            <h1 className="text-2xl font-bold text-brand-primary">
                                 {lead.sapaan} {lead.nama_pelanggan}
                             </h1>
                             {lead.nama_masjid_instansi && (
@@ -203,7 +203,7 @@ export default function ShowLead() {
                                     <Phone className="h-4 w-4 text-gray-400" />
                                     <a 
                                         href={`tel:${lead.no_whatsapp}`}
-                                        className="text-[#2B5235] hover:underline font-medium"
+                                        className="text-brand-primary hover:underline font-medium"
                                     >
                                         {formatPhoneNumber(lead.no_whatsapp)}
                                     </a>
@@ -215,7 +215,7 @@ export default function ShowLead() {
                                         href={`https://wa.me/${lead.no_whatsapp}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[#2B5235] hover:underline"
+                                        className="text-brand-primary hover:underline"
                                     >
                                         Kirim WhatsApp
                                     </a>

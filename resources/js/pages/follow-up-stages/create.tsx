@@ -59,7 +59,7 @@ export default function CreateFollowUpStage() {
                         </Link>
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Tambah Tahap Follow-up</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Tambah Tahap Follow-up</h1>
                         <p className="text-gray-600">Tambahkan tahap follow-up baru ke sistem</p>
                     </div>
                 </div>

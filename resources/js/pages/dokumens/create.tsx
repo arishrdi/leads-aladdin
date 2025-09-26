@@ -104,7 +104,7 @@ export default function CreateDokumen() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Upload Dokumen</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Upload Dokumen</h1>
                         <p className="text-gray-600">
                             Untuk {lead.sapaan} {lead.nama_pelanggan}
                         </p>
@@ -291,7 +291,7 @@ export default function CreateDokumen() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Kategori Penawaran:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Kategori Penawaran:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Proposal harga</li>
                                     <li>• Brosur produk</li>
@@ -299,7 +299,7 @@ export default function CreateDokumen() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Kategori Sketsa Survey:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Kategori Sketsa Survey:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Hasil survey lokasi</li>
                                     <li>• Sketsa desain</li>
@@ -307,7 +307,7 @@ export default function CreateDokumen() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Tips Upload:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Tips Upload:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Gunakan nama file yang jelas</li>
                                     <li>• Pastikan kualitas file baik</li>

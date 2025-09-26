@@ -15,10 +15,10 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[]
                                 <Fragment key={index}>
                                     <BreadcrumbItem>
                                         {isLast ? (
-                                            <BreadcrumbPage className="text-[#2B5235] font-medium">{item.title}</BreadcrumbPage>
+                                            <BreadcrumbPage className="text-brand-primary font-medium">{item.title}</BreadcrumbPage>
                                         ) : (
                                             <BreadcrumbLink asChild>
-                                                <Link href={item.href} className="text-gray-600 hover:text-[#2B5235] transition-colors">
+                                                <Link href={item.href} className="text-gray-600 hover:text-brand-primary transition-colors">
                                                     {item.title}
                                                 </Link>
                                             </BreadcrumbLink>

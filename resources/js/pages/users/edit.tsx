@@ -90,7 +90,7 @@ export default function EditUser() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Edit User: {user.name}</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Edit User: {user.name}</h1>
                         <p className="text-gray-600">
                             Perbarui informasi pengguna dan hak akses
                         </p>
@@ -315,7 +315,7 @@ export default function EditUser() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Password:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Password:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Kosongkan jika tidak ingin mengubah password</li>
                                     <li>• Password baru minimum 8 karakter</li>
@@ -324,7 +324,7 @@ export default function EditUser() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Role & Cabang:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Role & Cabang:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Mengubah role akan reset penugasan cabang</li>
                                     <li>• Marketing hanya bisa satu cabang</li>

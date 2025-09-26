@@ -170,7 +170,7 @@ export default function ReportsIndex() {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Laporan & Analitik</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Laporan & Analitik</h1>
                         <p className="text-gray-600">
                             Analisis performa dan insights dari data leads
                         </p>
@@ -285,7 +285,7 @@ export default function ReportsIndex() {
                 {/* Summary Statistics */}
                 <div className="space-y-6">
                     <div>
-                        <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Leads</h2>
+                        <h2 className="text-lg font-semibold text-brand-primary mb-4">Statistik Leads</h2>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                             <Card>
                                 <CardContent className="p-4">
@@ -319,11 +319,11 @@ export default function ReportsIndex() {
                                 <CardContent className="p-4">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-[#DDBE75]/20 rounded-lg">
-                                            <DollarSign className="h-5 w-5 text-[#2B5235]" />
+                                            <DollarSign className="h-5 w-5 text-brand-primary" />
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-600">Total Pendapatan</p>
-                                            <p className="text-lg font-bold text-[#2B5235]">
+                                            <p className="text-lg font-bold text-brand-primary">
                                                 {formatCurrency(summary.total_revenue)}
                                             </p>
                                         </div>
@@ -366,7 +366,7 @@ export default function ReportsIndex() {
                     </div>
 
                     <div>
-                        <h2 className="text-lg font-semibold text-[#2B5235] mb-4">Statistik Kunjungan</h2>
+                        <h2 className="text-lg font-semibold text-brand-primary mb-4">Statistik Kunjungan</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <Card>
                                 <CardContent className="p-4">
@@ -500,7 +500,7 @@ export default function ReportsIndex() {
                                     return (
                                         <div key={source.nama} className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-[#2B5235]/10 rounded-full flex items-center justify-center text-sm font-bold text-[#2B5235]">
+                                                <div className="w-8 h-8 bg-[#2B5235]/10 rounded-full flex items-center justify-center text-sm font-bold text-brand-primary">
                                                     {index + 1}
                                                 </div>
                                                 <span>{source.nama}</span>
@@ -555,7 +555,7 @@ export default function ReportsIndex() {
                                 {performance.top_performers.map((performer, index) => (
                                     <div key={performer.email} className="flex items-center justify-between p-3 border rounded-lg">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-[#2B5235]/10 rounded-full flex items-center justify-center text-sm font-bold text-[#2B5235]">
+                                            <div className="w-8 h-8 bg-[#2B5235]/10 rounded-full flex items-center justify-center text-sm font-bold text-brand-primary">
                                                 {index + 1}
                                             </div>
                                             <div>
@@ -570,7 +570,7 @@ export default function ReportsIndex() {
                                                     {performer.converted_leads} konversi
                                                 </Badge>
                                             </div>
-                                            <p className="text-sm font-medium text-[#2B5235]">
+                                            <p className="text-sm font-medium text-brand-primary">
                                                 {formatCurrency(performer.total_revenue)}
                                             </p>
                                         </div>
@@ -593,7 +593,7 @@ export default function ReportsIndex() {
                                 {performance.branch_performance.map((branch, index) => (
                                     <div key={branch.nama_cabang} className="flex items-center justify-between p-3 border rounded-lg">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-[#2B5235]/10 rounded-full flex items-center justify-center text-sm font-bold text-[#2B5235]">
+                                            <div className="w-8 h-8 bg-[#2B5235]/10 rounded-full flex items-center justify-center text-sm font-bold text-brand-primary">
                                                 {index + 1}
                                             </div>
                                             <span className="font-medium">{branch.nama_cabang}</span>
@@ -613,7 +613,7 @@ export default function ReportsIndex() {
                                                     {branch.completed_kunjungan || 0} selesai
                                                 </Badge>
                                             </div>
-                                            <p className="text-sm font-medium text-[#2B5235]">
+                                            <p className="text-sm font-medium text-brand-primary">
                                                 {formatCurrency(branch.total_revenue)}
                                             </p>
                                         </div>

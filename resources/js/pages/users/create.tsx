@@ -78,7 +78,7 @@ export default function CreateUser() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Tambah User Baru</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Tambah User Baru</h1>
                         <p className="text-gray-600">
                             Buat akun pengguna baru dan atur hak akses
                         </p>

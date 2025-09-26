@@ -164,6 +164,7 @@ export default function Dashboard() {
     const isMarketing = auth.user.role === 'marketing';
     const canViewAnalytics = auth.user.role === 'supervisor' || auth.user.role === 'super_user';
     const isSuperUser = auth.user.role === 'super_user';
+    const canCompareOutlets = auth.user.role === 'supervisor' || auth.user.role === 'super_user';
     
     // Comparison Mode State
     const [comparisonMode, setComparisonMode] = useState(false);
@@ -226,7 +227,7 @@ export default function Dashboard() {
                                 </Button>
                             </Link>
                         )}
-                        {isSuperUser && all_branches && all_branches.length > 0 && (
+                        {canCompareOutlets && all_branches && all_branches.length > 0 && (
                             <Button 
                                 onClick={() => setComparisonMode(!comparisonMode)}
                                 variant={comparisonMode ? "default" : "outline"}
@@ -240,7 +241,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Branch Selector for Comparison Mode */}
-                {comparisonMode && isSuperUser && all_branches && (
+                {comparisonMode && canCompareOutlets && all_branches && (
                     <Card className="">
                         <CardHeader>
                             <div className="flex items-center justify-between">

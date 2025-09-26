@@ -64,7 +64,7 @@ export default function CreateCabang() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Tambah Cabang Baru</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Tambah Cabang Baru</h1>
                         <p className="text-gray-600">
                             Buat cabang baru dan tugaskan supervisor
                         </p>
@@ -254,7 +254,7 @@ export default function CreateCabang() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Informasi Cabang:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Informasi Cabang:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Gunakan nama yang jelas dan mudah diingat</li>
                                     <li>• Pastikan alamat lengkap dan akurat</li>
@@ -263,7 +263,7 @@ export default function CreateCabang() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Penugasan Supervisor:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Penugasan Supervisor:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Supervisor dapat mengelola multiple cabang</li>
                                     <li>• Marketing ditugaskan melalui user management</li>

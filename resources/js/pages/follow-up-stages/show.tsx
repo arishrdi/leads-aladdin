@@ -62,7 +62,7 @@ export default function ShowFollowUpStage() {
                             </Link>
                         </Button>
                         <div>
-                            <h1 className="text-2xl font-bold text-[#2B5235]">Detail Tahap Follow-up</h1>
+                            <h1 className="text-2xl font-bold text-brand-primary">Detail Tahap Follow-up</h1>
                             <p className="text-gray-600">Informasi lengkap tahap: {stage.name}</p>
                         </div>
                     </div>

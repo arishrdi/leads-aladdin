@@ -40,7 +40,7 @@ export default function CreateTipeKarpet() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Tambah Tipe Karpet Baru</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Tambah Tipe Karpet Baru</h1>
                         <p className="text-gray-600">
                             Buat tipe karpet baru untuk mengkategorikan produk
                         </p>
@@ -133,7 +133,7 @@ export default function CreateTipeKarpet() {
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Contoh Tipe Karpet:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Contoh Tipe Karpet:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Karpet Masjid (berbagai ukuran dan motif)</li>
                                     <li>• Karpet Hotel (berkualitas tinggi)</li>
@@ -144,7 +144,7 @@ export default function CreateTipeKarpet() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2 text-[#2B5235]">Tips Pengelolaan:</h4>
+                                <h4 className="font-medium mb-2 text-brand-primary">Tips Pengelolaan:</h4>
                                 <ul className="space-y-1 text-gray-600">
                                     <li>• Gunakan nama yang spesifik dan jelas</li>
                                     <li>• Tambahkan deskripsi untuk spesifikasi detail</li>

@@ -110,7 +110,7 @@ export default function ReportsAnalytics() {
             <div className="space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-[#2B5235]">Analytics Detail</h1>
+                    <h1 className="text-2xl font-bold text-brand-primary">Analytics Detail</h1>
                     <p className="text-gray-600">
                         Insights mendalam dan prediktif untuk optimasi performa
                     </p>
@@ -267,7 +267,7 @@ export default function ReportsAnalytics() {
                                                 </div>
                                                 <div>
                                                     <div className="text-sm text-gray-600">Revenue</div>
-                                                    <div className="text-lg font-bold text-[#2B5235]">
+                                                    <div className="text-lg font-bold text-brand-primary">
                                                         {formatCurrency(month.revenue)}
                                                     </div>
                                                 </div>
@@ -382,16 +382,16 @@ export default function ReportsAnalytics() {
                                         <p className="text-sm text-blue-800 mb-3">
                                             Review dan perbaiki proses dari QUALIFIED ke WARM
                                         </p>
-                                        <Button size="sm" variant="outline" className="text-[#2B5235] border-[#2B5235]">
+                                        <Button size="sm" variant="outline" className="text-brand-primary border-[#2B5235]">
                                             Lihat Detail
                                         </Button>
                                     </div>
                                     <div className="p-4 border border-[#2B5235]/20 rounded-lg bg-[#2B5235]/5">
-                                        <h4 className="font-medium text-[#2B5235] mb-2">Team Training</h4>
-                                        <p className="text-sm text-[#2B5235]/80 mb-3">
+                                        <h4 className="font-medium text-brand-primary mb-2">Team Training</h4>
+                                        <p className="text-sm text-brand-primary/80 mb-3">
                                             Latihan teknik closing untuk meningkatkan HOT to CONVERTED
                                         </p>
-                                        <Button size="sm" variant="outline" className="text-[#2B5235] border-[#2B5235]">
+                                        <Button size="sm" variant="outline" className="text-brand-primary border-[#2B5235]">
                                             Jadwalkan
                                         </Button>
                                     </div>
@@ -409,7 +409,7 @@ export default function ReportsAnalytics() {
                             <CardContent>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div className="text-center p-6 border rounded-lg">
-                                        <h3 className="text-lg font-bold text-[#2B5235]">Juli 2024</h3>
+                                        <h3 className="text-lg font-bold text-brand-primary">Juli 2024</h3>
                                         <div className="mt-4 space-y-2">
                                             <div>
                                                 <p className="text-sm text-gray-600">Estimasi Leads</p>
@@ -421,7 +421,7 @@ export default function ReportsAnalytics() {
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-600">Estimasi Revenue</p>
-                                                <p className="text-lg font-bold text-[#2B5235]">
+                                                <p className="text-lg font-bold text-brand-primary">
                                                     {formatCurrency(600000000)}
                                                 </p>
                                             </div>
@@ -429,7 +429,7 @@ export default function ReportsAnalytics() {
                                     </div>
 
                                     <div className="text-center p-6 border rounded-lg">
-                                        <h3 className="text-lg font-bold text-[#2B5235]">Agustus 2024</h3>
+                                        <h3 className="text-lg font-bold text-brand-primary">Agustus 2024</h3>
                                         <div className="mt-4 space-y-2">
                                             <div>
                                                 <p className="text-sm text-gray-600">Estimasi Leads</p>
@@ -441,7 +441,7 @@ export default function ReportsAnalytics() {
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-600">Estimasi Revenue</p>
-                                                <p className="text-lg font-bold text-[#2B5235]">
+                                                <p className="text-lg font-bold text-brand-primary">
                                                     {formatCurrency(650000000)}
                                                 </p>
                                             </div>
@@ -449,7 +449,7 @@ export default function ReportsAnalytics() {
                                     </div>
 
                                     <div className="text-center p-6 border rounded-lg">
-                                        <h3 className="text-lg font-bold text-[#2B5235]">September 2024</h3>
+                                        <h3 className="text-lg font-bold text-brand-primary">September 2024</h3>
                                         <div className="mt-4 space-y-2">
                                             <div>
                                                 <p className="text-sm text-gray-600">Estimasi Leads</p>
@@ -461,7 +461,7 @@ export default function ReportsAnalytics() {
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-600">Estimasi Revenue</p>
-                                                <p className="text-lg font-bold text-[#2B5235]">
+                                                <p className="text-lg font-bold text-brand-primary">
                                                     {formatCurrency(720000000)}
                                                 </p>
                                             </div>

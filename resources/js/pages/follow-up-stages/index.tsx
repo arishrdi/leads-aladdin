@@ -78,7 +78,7 @@ export default function FollowUpStagesIndex() {
             <div className="space-y-6">
                 <div className="flex gap-4 lg:gap-0 lg:items-center justify-start lg:justify-between lg:flex-row flex-col">
                     <div className='w-full'>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Kelola Tahap Follow-up</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Kelola Tahap Follow-up</h1>
                         <p className="text-gray-600 mt-1">
                             Kelola tahapan follow-up yang digunakan dalam sistem leads
                         </p>

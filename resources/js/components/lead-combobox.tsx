@@ -103,7 +103,7 @@ export function LeadCombobox({
                     onValueChange(lead.id.toString() === value ? "" : lead.id.toString())
                     setOpen(false)
                   }}
-                  className="flex items-start gap-3 p-3"
+                  className="flex items-start gap-3 p-3 w-72"
                 >
                   <Check
                     className={cn(
@@ -129,8 +129,8 @@ export function LeadCombobox({
                     )}
                     
                     <div className="flex items-center gap-4 text-xs text-gray-500">
-                      <span>📱 {formatPhoneNumber(lead.no_whatsapp)}</span>
-                      <span>🏢 {lead.cabang.nama_cabang}</span>
+                      {/* <span>📱 {formatPhoneNumber(lead.no_whatsapp)}</span>
+                      <span>🏢 {lead.cabang.nama_cabang}</span> */}
                       <span className={cn(
                         "px-2 py-0.5 rounded-full text-xs font-medium",
                         lead.status === 'WARM' && "bg-yellow-100 text-yellow-800",

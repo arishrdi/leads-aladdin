@@ -89,7 +89,7 @@ export default function UsersIndex() {
             <div className="space-y-6">
                 <div className="flex gap-4 lg:gap-0 lg:items-center justify-start lg:justify-between lg:flex-row flex-col">
                     <div className='w-full'>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Kelola User</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Kelola User</h1>
                         <p className="text-gray-600 mt-1">
                             Kelola pengguna sistem dan hak akses di seluruh cabang
                         </p>
@@ -128,11 +128,11 @@ export default function UsersIndex() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                    <Users className="h-5 w-5 text-[#2B5235]" />
+                                    <Users className="h-5 w-5 text-brand-primary" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Total User Aktif</p>
-                                    <p className="text-2xl font-bold text-[#2B5235]">
+                                    <p className="text-2xl font-bold text-brand-primary">
                                         {activeUsers.length}
                                     </p>
                                 </div>
@@ -214,7 +214,7 @@ export default function UsersIndex() {
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                                        <User className="h-4 w-4 text-[#2B5235]" />
+                                                        <User className="h-4 w-4 text-brand-primary" />
                                                     </div>
                                                     <span className="font-medium">{user.name}</span>
                                                 </div>
@@ -311,10 +311,10 @@ export default function UsersIndex() {
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                                <User className="h-5 w-5 text-[#2B5235]" />
+                                                <User className="h-5 w-5 text-brand-primary" />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-lg text-[#2B5235]">
+                                                <CardTitle className="text-lg text-brand-primary">
                                                     {user.name}
                                                 </CardTitle>
                                                 <p className="text-sm text-gray-600 flex items-center gap-1">

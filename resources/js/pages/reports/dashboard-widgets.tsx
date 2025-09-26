@@ -74,7 +74,7 @@ export default function DashboardWidgets() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Overview Hari Ini</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Overview Hari Ini</h1>
                         <p className="text-gray-600">
                             {new Date().toLocaleDateString('id-ID', { 
                                 weekday: 'long', 
@@ -266,7 +266,7 @@ export default function DashboardWidgets() {
                                 <div className="text-xs text-green-600 mt-1">Di atas target 85%</div>
                             </div>
                             <div className="text-center p-4 border rounded-lg">
-                                <div className="text-2xl font-bold text-[#2B5235]">4.2</div>
+                                <div className="text-2xl font-bold text-brand-primary">4.2</div>
                                 <div className="text-sm text-gray-600">Avg Rating</div>
                                 <div className="text-xs text-gray-500 mt-1">Customer satisfaction</div>
                             </div>

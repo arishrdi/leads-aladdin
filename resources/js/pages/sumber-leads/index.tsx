@@ -55,7 +55,7 @@ export default function SumberLeadsIndex() {
             <div className="space-y-6">
                 <div className="flex gap-4 lg:gap-0 lg:items-center justify-start lg:justify-between lg:flex-row flex-col">
                     <div className='w-full'>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Sumber Leads</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Sumber Leads</h1>
                         <p className="text-gray-600 mt-1">
                             Kelola sumber-sumber dimana leads berasal
                         </p>
@@ -94,11 +94,11 @@ export default function SumberLeadsIndex() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                    <Database className="h-5 w-5 text-[#2B5235]" />
+                                    <Database className="h-5 w-5 text-brand-primary" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Total Sumber Aktif</p>
-                                    <p className="text-2xl font-bold text-[#2B5235]">
+                                    <p className="text-2xl font-bold text-brand-primary">
                                         {activeSumberLeads.length}
                                     </p>
                                 </div>
@@ -167,7 +167,7 @@ export default function SumberLeadsIndex() {
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                                        <Database className="h-4 w-4 text-[#2B5235]" />
+                                                        <Database className="h-4 w-4 text-brand-primary" />
                                                     </div>
                                                     <div>
                                                         <span className="font-medium">{sumberLead.nama}</span>
@@ -187,7 +187,7 @@ export default function SumberLeadsIndex() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-center">
-                                                    <div className="text-lg font-bold text-[#2B5235]">
+                                                    <div className="text-lg font-bold text-brand-primary">
                                                         {sumberLead.leads_count || 0}
                                                     </div>
                                                 </div>
@@ -255,10 +255,10 @@ export default function SumberLeadsIndex() {
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-[#2B5235]/10 rounded-lg">
-                                                <Database className="h-5 w-5 text-[#2B5235]" />
+                                                <Database className="h-5 w-5 text-brand-primary" />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-lg text-[#2B5235]">
+                                                <CardTitle className="text-lg text-brand-primary">
                                                     {sumberLead.nama}
                                                 </CardTitle>
                                                 <p className="text-sm text-gray-600">
@@ -286,7 +286,7 @@ export default function SumberLeadsIndex() {
                                     {/* Stats */}
                                     <div className="grid grid-cols-2 gap-4 py-3 border-t border-gray-100">
                                         <div className="text-center">
-                                            <div className="text-lg font-bold text-[#2B5235]">
+                                            <div className="text-lg font-bold text-brand-primary">
                                                 {sumberLead.leads_count || 0}
                                             </div>
                                             <div className="text-xs text-gray-500">Total Leads</div>

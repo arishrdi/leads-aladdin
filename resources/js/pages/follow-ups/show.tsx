@@ -148,7 +148,7 @@ export default function ShowFollowUp() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div className="flex-1">
-                        <h1 className="text-2xl font-bold text-[#2B5235]">
+                        <h1 className="text-2xl font-bold text-brand-primary">
                             Follow-up: {followUp.stage}
                         </h1>
                         <p className="text-gray-600">
@@ -196,7 +196,7 @@ export default function ShowFollowUp() {
                                 <div className="flex gap-2">
                                     <a 
                                         href={`tel:${followUp.leads.no_whatsapp}`}
-                                        className="text-[#2B5235] hover:underline font-medium"
+                                        className="text-brand-primary hover:underline font-medium"
                                     >
                                         {formatPhoneNumber(followUp.leads.no_whatsapp)}
                                     </a>
@@ -205,7 +205,7 @@ export default function ShowFollowUp() {
                                         href={`https://wa.me/${followUp.leads.no_whatsapp}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[#2B5235] hover:underline"
+                                        className="text-brand-primary hover:underline"
                                     >
                                         WhatsApp
                                     </a>

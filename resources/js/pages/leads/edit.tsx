@@ -167,7 +167,7 @@ export default function EditLead() {
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Edit Lead</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Edit Lead</h1>
                         <p className="text-gray-600">{lead.nama_pelanggan}</p>
                     </div>
                 </div>

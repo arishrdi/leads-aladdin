@@ -53,7 +53,7 @@ export function MobileNav({ user }: MobileNavProps) {
                                 className={`w-full flex flex-col items-center gap-1 h-auto py-2 px-1 ${
                                     isActive 
                                         ? `${action.color} text-white hover:${action.color}/90` 
-                                        : 'text-gray-600 hover:text-[#2B5235] hover:bg-gray-50'
+                                        : 'text-gray-600 hover:text-brand-primary hover:bg-gray-50'
                                 }`}
                             >
                                 <action.icon className="h-4 w-4" />

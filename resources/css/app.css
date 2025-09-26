@@ -62,7 +62,8 @@
 :root {
     /* Brand Colors - #2B5235 (Primary), #DDBE75 (Secondary) */
     --brand-primary: #2B5235;
-    --brand-primary-light: #3d6b4a;
+    --brand-primary-light: #4ade80;
+    --brand-primary-lighter: #6ee7b7;
     --brand-primary-dark: #1e3d26;
     --brand-secondary: #DDBE75;
     --brand-secondary-light: #e4c985;
@@ -161,8 +162,8 @@
     
     /* Primary - lighter brand primary for dark mode */
     --primary: var(--brand-primary-light);
-    --primary-foreground: oklch(0.95 0 0);
-    --primary-hover: var(--brand-primary);
+    --primary-foreground: oklch(0.1 0 0);
+    --primary-hover: var(--brand-primary-lighter);
     
     /* Secondary */
     --secondary: oklch(0.2 0 0);
@@ -198,7 +199,7 @@
     --chart-2: var(--brand-secondary);
     --chart-3: #60a5fa;
     --chart-4: #fb923c;
-    --chart-5: #4ade80;
+    --chart-5: var(--brand-primary-light);
     
     /* Sidebar */
     --sidebar: oklch(0.12 0 0);
@@ -266,9 +267,9 @@
 }
 
 @layer utilities {
-    /* Brand color utilities */
+    /* Brand color utilities - automatically adapt to dark mode via primary/accent variables */
     .text-brand-primary {
-        color: var(--brand-primary);
+        color: var(--primary);
     }
     
     .text-brand-secondary {
@@ -276,7 +277,11 @@
     }
     
     .bg-brand-primary {
-        background-color: var(--brand-primary);
+        background-color: var(--primary);
+    }
+    
+    .bg-brand-primary-hover {
+        background-color: var(--primary-hover);
     }
     
     .bg-brand-secondary {
@@ -284,11 +289,25 @@
     }
     
     .border-brand-primary {
-        border-color: var(--brand-primary);
+        border-color: var(--primary);
     }
     
     .border-brand-secondary {
         border-color: var(--brand-secondary);
+    }
+    
+    /* Hover variants */
+    .hover\:bg-brand-primary-dark:hover {
+        background-color: var(--brand-primary-dark);
+    }
+    
+    /* Explicit brand color utilities (don't change with dark mode) */
+    .text-brand-primary-base {
+        color: var(--brand-primary);
+    }
+    
+    .text-brand-primary-light {
+        color: var(--brand-primary-light);
     }
 
     /* Status color utilities */

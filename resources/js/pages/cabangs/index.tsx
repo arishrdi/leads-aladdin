@@ -53,7 +53,7 @@ export default function CabangsIndex() {
             <div className="space-y-6">
                 <div className="flex flex-col justify-start gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-0">
                     <div className="w-full">
-                        <h1 className="text-2xl font-bold text-[#2B5235]">Manajemen Cabang</h1>
+                        <h1 className="text-2xl font-bold text-brand-primary">Manajemen Cabang</h1>
                         <p className="mt-1 text-gray-600">Kelola cabang dan penugasan marketing di seluruh lokasi</p>
                     </div>
                     <div className="flex w-full items-center justify-between gap-3 lg:justify-end">
@@ -90,11 +90,11 @@ export default function CabangsIndex() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="rounded-lg bg-[#2B5235]/10 p-2">
-                                    <Building className="h-5 w-5 text-[#2B5235]" />
+                                    <Building className="h-5 w-5 text-brand-primary" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Total Cabang</p>
-                                    <p className="text-2xl font-bold text-[#2B5235]">{cabangs.filter((c) => c.is_active).length}</p>
+                                    <p className="text-2xl font-bold text-brand-primary">{cabangs.filter((c) => c.is_active).length}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -184,7 +184,7 @@ export default function CabangsIndex() {
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="rounded-lg bg-[#2B5235]/10 p-2">
-                                                        <Building className="h-4 w-4 text-[#2B5235]" />
+                                                        <Building className="h-4 w-4 text-brand-primary" />
                                                     </div>
                                                     <div>
                                                         <span className="font-medium">{cabang.nama_cabang}</span>
@@ -194,7 +194,7 @@ export default function CabangsIndex() {
                                             </TableCell>
                                             <TableCell>{cabang.pic}</TableCell>
                                             <TableCell>
-                                                <a href={`tel:${cabang.no_telp}`} className="text-[#2B5235] hover:underline">
+                                                <a href={`tel:${cabang.no_telp}`} className="text-brand-primary hover:underline">
                                                     {cabang.no_telp}
                                                 </a>
                                             </TableCell>
@@ -208,7 +208,7 @@ export default function CabangsIndex() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-center">
-                                                    <div className="text-lg font-bold text-[#2B5235]">{cabang.users_count}</div>
+                                                    <div className="text-lg font-bold text-brand-primary">{cabang.users_count}</div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
@@ -277,10 +277,10 @@ export default function CabangsIndex() {
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="rounded-lg bg-[#2B5235]/10 p-2">
-                                                <Building className="h-5 w-5 text-[#2B5235]" />
+                                                <Building className="h-5 w-5 text-brand-primary" />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-lg text-[#2B5235]">{cabang.nama_cabang}</CardTitle>
+                                                <CardTitle className="text-lg text-brand-primary">{cabang.nama_cabang}</CardTitle>
                                                 <p className="flex items-center gap-1 text-sm text-gray-600">
                                                     <MapPin className="h-3 w-3" />
                                                     {cabang.lokasi}
@@ -301,7 +301,7 @@ export default function CabangsIndex() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Phone className="h-4 w-4 text-gray-400" />
-                                            <a href={`tel:${cabang.no_telp}`} className="text-[#2B5235] hover:underline">
+                                            <a href={`tel:${cabang.no_telp}`} className="text-brand-primary hover:underline">
                                                 {cabang.no_telp}
                                             </a>
                                         </div>
@@ -314,7 +314,7 @@ export default function CabangsIndex() {
                                     {/* Stats */}
                                     <div className="grid grid-cols-3 gap-4 border-t border-gray-100 py-3">
                                         <div className="text-center">
-                                            <div className="text-lg font-bold text-[#2B5235]">{cabang.users_count}</div>
+                                            <div className="text-lg font-bold text-brand-primary">{cabang.users_count}</div>
                                             <div className="text-xs text-gray-500">Marketing</div>
                                         </div>
                                         <div className="text-center">
