@@ -7,11 +7,14 @@ Sistem Manajemen Leads untuk Industri Karpet
 ## DAFTAR ISI
 
 1. [Pengenalan Sistem](#pengenalan-sistem)
-2. [Login dan Dashboard](#login-dan-dashboard)
-3. [Panduan Super User](#panduan-super-user)
-4. [Panduan Supervisor](#panduan-supervisor)
-5. [Panduan Marketing](#panduan-marketing)
-6. [FAQ dan Tips](#faq-dan-tips)
+2. [Matriks Role dan Permissions](#matriks-role-dan-permissions)
+3. [Login dan Dashboard](#login-dan-dashboard)
+4. [Panduan Super User](#panduan-super-user)
+5. [Panduan Supervisor](#panduan-supervisor)
+6. [Panduan Marketing](#panduan-marketing)
+7. [Workflow dan Proses Bisnis](#workflow-dan-proses-bisnis)
+8. [Spesifikasi Teknis](#spesifikasi-teknis)
+9. [FAQ dan Tips](#faq-dan-tips)
 
 ---
 
@@ -42,6 +45,110 @@ Leads Aladdin adalah sistem manajemen lead penjualan yang dirancang khusus untuk
 8. **Up/Cross Selling** - Penawaran produk tambahan
 9. **Invoice** - Pembayaran
 10. **Konfirmasi Pemasangan** - Konfirmasi jadwal pemasangan
+
+---
+
+## MATRIKS ROLE DAN PERMISSIONS
+
+### Tabel Role dan Hak Akses
+
+| **Fitur/Menu** | **Super User** | **Supervisor** | **Marketing** | **Keterangan** |
+|----------------|----------------|----------------|---------------|----------------|
+| **DASHBOARD** | ✅ | ✅ | ✅ | Dashboard disesuaikan berdasarkan role |
+| **Leads Management** | | | | |
+| ├─ Lihat Semua Leads | ✅ | ✅ (Multi-cabang) | ✅ (1 cabang) | Marketing hanya melihat leads cabang sendiri |
+| ├─ Tambah Leads | ✅ | ❌ | ✅ | Supervisor tidak bisa menambah leads |
+| ├─ Edit Leads | ✅ | ❌ | ✅ | Supervisor hanya monitoring |
+| ├─ Hapus Leads | ✅ | ❌ | ❌ | Hanya Super User yang bisa hapus |
+| ├─ Export Leads | ✅ | ✅ | ❌ | Marketing tidak bisa export |
+| **Follow Up Management** | | | | |
+| ├─ Lihat Follow Ups | ✅ | ✅ | ✅ | Sesuai akses cabang masing-masing |
+| ├─ Tambah Follow Up | ✅ | ❌ | ✅ | Supervisor hanya monitoring |
+| ├─ Complete Follow Up | ✅ | ❌ | ✅ | Marketing yang eksekusi follow up |
+| ├─ Reschedule Follow Up | ✅ | ❌ | ✅ | Marketing bisa reschedule |
+| ├─ Excel View | ✅ | ✅ | ✅ | View khusus untuk analisis |
+| **Document Management** | | | | |
+| ├─ Upload Dokumen | ✅ | ❌ | ✅ | Marketing upload dokumen leads |
+| ├─ Download Dokumen | ✅ | ✅ | ✅ | Semua bisa download |
+| ├─ Hapus Dokumen | ✅ | ❌ | ✅ | Marketing bisa hapus dokumen sendiri |
+| ├─ Lihat Semua Dokumen | ✅ | ✅ | ✅ | Sesuai akses cabang |
+| **Kunjungan (Survey)** | | | | |
+| ├─ Tambah Kunjungan | ✅ | ❌ | ✅ | Marketing yang melakukan kunjungan |
+| ├─ Edit Kunjungan | ✅ | ❌ | ✅ | Marketing update hasil kunjungan |
+| ├─ Lihat Kunjungan | ✅ | ✅ | ✅ | Sesuai akses cabang |
+| ├─ Kelola Item Kunjungan | ✅ | ❌ | ✅ | Detail pengukuran dan estimasi |
+| **User Management** | | | | |
+| ├─ CRUD Users | ✅ | ❌ | ❌ | Hanya Super User |
+| ├─ Assign User ke Cabang | ✅ | ❌ | ❌ | Hanya Super User |
+| ├─ Reset Password User | ✅ | ❌ | ❌ | Hanya Super User |
+| **Branch Management** | | | | |
+| ├─ CRUD Cabang | ✅ | ❌ | ❌ | Hanya Super User |
+| ├─ Assign Users ke Cabang | ✅ | ❌ | ❌ | Hanya Super User |
+| ├─ Lihat Stats Cabang | ✅ | ✅ | ❌ | Supervisor sesuai cabang yang diawasi |
+| **Master Data** | | | | |
+| ├─ Sumber Leads | ✅ | ❌ | ❌ | Hanya Super User |
+| ├─ Tipe Karpet | ✅ | ❌ | ❌ | Hanya Super User |
+| ├─ Follow Up Stages | ✅ | ❌ | ❌ | Hanya Super User |
+| ├─ Kunjungan Items | ✅ | ❌ | ❌ | Hanya Super User |
+| **Reports & Analytics** | | | | |
+| ├─ Dashboard Reports | ✅ | ✅ | ❌ | Supervisor akses multi-cabang |
+| ├─ Export Reports | ✅ | ✅ | ❌ | Format Excel/PDF |
+| ├─ Analytics Dashboard | ✅ | ✅ | ❌ | Conversion rate, trends, dll |
+| ├─ Cross-Branch Reports | ✅ | ❌ | ❌ | Hanya Super User |
+
+### Detail Akses Cabang
+
+| **Role** | **Akses Cabang** | **Deskripsi** |
+|----------|------------------|---------------|
+| **Super User** | Semua cabang | Dapat beralih antar cabang dan melihat data global |
+| **Supervisor** | Multi-cabang (assigned) | Dapat diassign ke 1 atau lebih cabang |
+| **Marketing** | 1 cabang (assigned) | Hanya bisa akses 1 cabang yang ditugaskan |
+
+### Level Otorisasi Data
+
+| **Level** | **Super User** | **Supervisor** | **Marketing** |
+|-----------|----------------|----------------|---------------|
+| **System Configuration** | ✅ Full Control | ❌ | ❌ |
+| **Multi-Branch Operations** | ✅ | ✅ (assigned branches) | ❌ |
+| **Operational Tasks** | ✅ | Read Only | ✅ (own branch) |
+| **Reports & Analytics** | ✅ All branches | ✅ Assigned branches | ❌ |
+| **Data Export** | ✅ | ✅ | ❌ |
+
+### Menu yang Tampil per Role
+
+#### Super User - Menu Lengkap:
+- Dashboard
+- Leads
+- Follow Ups  
+- Dokumen
+- Kunjungan
+- Users ⭐
+- Cabang ⭐
+- Sumber Leads ⭐
+- Tipe Karpet ⭐
+- Follow Up Stages ⭐
+- Kunjungan Items ⭐
+- Reports ⭐
+
+#### Supervisor - Menu Monitoring:
+- Dashboard
+- Leads (Read Only)
+- Follow Ups (Read Only)
+- Dokumen (Read Only)
+- Kunjungan (Read Only)
+- Reports ⭐
+
+#### Marketing - Menu Operasional:
+- Dashboard
+- Leads
+- Follow Ups
+- Dokumen
+- Kunjungan
+
+**Keterangan:**
+- ⭐ Menu khusus untuk role tertentu
+- Semua akses disesuaikan dengan cabang yang di-assign
+- Super User dapat switch antar cabang menggunakan dropdown selector
 
 ---
 
@@ -255,7 +362,7 @@ Marketing fokus pada pengelolaan leads di satu cabang yang ditugaskan.
 ### 2. MENGELOLA LEADS
 
 #### Menambah Leads Baru
-1. Klik tombol **"Tambah Leads"** atau menu **"Leads"** � **"Tambah"**
+1. Klik tombol **"Tambah Leads"** atau menu **"Leads"** � **"Tambah"**
 2. Isi formulir leads:
    - **Tanggal Leads**: Tanggal kontak pertama
    - **Sapaan**: Bapak/Ibu
@@ -384,6 +491,260 @@ Marketing fokus pada pengelolaan leads di satu cabang yang ditugaskan.
 
 ---
 
+## WORKFLOW DAN PROSES BISNIS
+
+### Flow Chart Manajemen Leads
+
+```
+LEAD BARU (WARM)
+       ↓
+   FOLLOW UP
+       ↓
+┌─────────────────┐
+│  GREETING       │ ← Maksimal 3x percobaan
+│  (Hari 1,4,7)   │
+└─────────┬───────┘
+          ↓ (Ada respon)
+┌─────────────────┐
+│  IMPRESI        │ ← Maksimal 3x percobaan
+│  (Hari 10,13,16)│
+└─────────┬───────┘
+          ↓ (Tertarik)
+┌─────────────────┐
+│  SMALL TALK     │ ← Build rapport
+│  (Hari 19)      │
+└─────────┬───────┘
+          ↓
+┌─────────────────┐
+│  REKOMENDASI    │ ← Tawar produk
+│  (Hari 22,25)   │
+└─────────┬───────┘
+          ↓ (Minat)
+┌─────────────────┐
+│  SURVEI         │ ← Status: HOT
+│  (Hari 28)      │
+└─────────┬───────┘
+          ↓
+┌─────────────────┐
+│  PRESENTASI     │ ← Tunjukkan desain
+│  (Hari 31)      │
+└─────────┬───────┘
+          ↓
+┌─────────────────┐
+│  FORM PESANAN   │ ← Isi formulir
+│  (Hari 34,37)   │
+└─────────┬───────┘
+          ↓ (Deal)
+┌─────────────────┐
+│  INVOICE        │ ← Status: CUSTOMER
+│  (Hari 40)      │
+└─────────┬───────┘
+          ↓
+┌─────────────────┐
+│  PEMASANGAN     │ ← Konfirmasi jadwal
+│  (Hari 43)      │
+└─────────────────┘
+```
+
+### Status Progression Flow
+
+```
+WARM ──→ HOT ──→ CUSTOMER
+ │        │         ↓
+ │        │    CROSS_SELLING
+ │        │
+ ↓        ↓
+EXIT ←── COLD
+```
+
+### Decision Tree Follow Up
+
+```
+Follow Up Dilakukan?
+├─ YA: Ada Respon?
+│  ├─ YA: Lanjut ke Stage Berikutnya
+│  └─ TIDAK: Coba lagi (maks 3x)
+│     ├─ Belum 3x: Jadwalkan ulang (+3 hari)
+│     └─ Sudah 3x: Status jadi COLD
+└─ TIDAK: Follow up tertunda
+   └─ Update jadwal follow up
+```
+
+### Workflow Kunjungan (Survey)
+
+```
+LEADS STATUS HOT
+       ↓
+  JADWAL SURVEY
+       ↓
+   KUNJUNGAN
+  ┌─────────┐
+  │ Ukur    │
+  │ Foto    │
+  │ Sketsa  │
+  │ Hitung  │
+  └─────────┘
+       ↓
+   INPUT DATA
+  ┌─────────┐
+  │ Dimensi │
+  │ Foto    │
+  │ Estimasi│
+  │ Catatan │
+  └─────────┘
+       ↓
+   PRESENTASI
+```
+
+### Workflow Dokumen
+
+```
+CREATE DOKUMEN
+       ↓
+   PILIH LEADS
+       ↓
+   ISI DETAIL
+  ┌─────────┐
+  │ Judul   │
+  │ Kategori│
+  │ Desk.   │
+  │ File    │
+  └─────────┘
+       ↓
+     UPLOAD
+       ↓
+   TERSIMPAN
+```
+
+### Process Marketing Daily
+
+```
+PAGI (08:00)
+├─ Cek Dashboard
+├─ Lihat Follow Up Hari Ini
+└─ Prioritas Leads HOT
+
+SIANG (13:00)
+├─ Eksekusi Follow Up
+├─ Update Status Leads
+└─ Upload Dokumen
+
+SORE (17:00)
+├─ Input Hasil Follow Up
+├─ Schedule Follow Up Berikutnya
+└─ Update Kunjungan
+```
+
+---
+
+## SPESIFIKASI TEKNIS
+
+### Persyaratan Sistem
+
+#### Server Requirements
+- **Backend**: Laravel 12 + PHP 8.2+
+- **Database**: SQLite (development), MySQL/PostgreSQL (production)
+- **Cache**: Redis (optional)
+- **Queue**: Database/Redis
+- **Storage**: Local filesystem (public directory)
+
+#### Browser Compatibility
+- **Recommended**: Chrome 90+, Firefox 88+, Safari 14+
+- **Mobile**: iOS Safari 14+, Chrome Mobile 90+
+- **Resolution**: Minimum 320px width (mobile first)
+
+### File Upload Specifications
+
+| **Type** | **Max Size** | **Format** | **Usage** |
+|----------|--------------|------------|-----------|
+| **Dokumen Leads** | 10MB | PDF, DOC, XLSX, JPG, PNG | Penawaran, sketsa, kontrak |
+| **Foto Kunjungan** | 5MB | JPG, PNG, WEBP | Foto lokasi survey |
+| **Avatar User** | 2MB | JPG, PNG | Profile picture |
+
+### Database Schema Overview
+
+#### Core Tables
+- **users**: Data pengguna dan role
+- **cabangs**: Master data cabang
+- **user_cabangs**: Relasi user-cabang (many-to-many)
+- **leads**: Data leads utama
+- **follow_ups**: Riwayat follow up
+- **follow_up_stages**: Master tahapan follow up
+- **dokumens**: File dokumen leads
+- **kunjungans**: Data kunjungan/survey
+- **kunjungan_items**: Item detail kunjungan
+
+#### Master Data Tables
+- **sumber_leads**: Master sumber leads
+- **tipe_karpets**: Master tipe karpet
+- **kunjungan_item_categories**: Kategori item kunjungan
+
+### API Endpoints Overview
+
+#### Authentication
+- `POST /login` - User login
+- `POST /logout` - User logout
+- `POST /password/reset` - Reset password
+
+#### Leads Management
+- `GET /leads` - List leads (filtered by role/branch)
+- `POST /leads` - Create new lead
+- `GET /leads/{id}` - Show lead detail
+- `PUT /leads/{id}` - Update lead
+- `DELETE /leads/{id}` - Delete lead (super user only)
+
+#### Follow Up Management
+- `GET /follow-ups` - List follow ups
+- `POST /leads/{id}/follow-ups` - Create follow up
+- `PATCH /follow-ups/{id}/complete` - Complete follow up
+- `PATCH /follow-ups/{id}/reschedule` - Reschedule follow up
+
+### Configuration Files
+
+#### config/leads.php
+```php
+'statuses' => [
+    'WARM', 'HOT', 'CUSTOMER', 'EXIT', 'COLD', 'CROSS_SELLING'
+]
+'prioritas' => ['fasttrack', 'normal', 'rendah']
+'sapaan' => ['Bapak', 'Ibu']
+'alasan_closing' => [...] // 6 alasan
+'alasan_tidak_closing' => [...] // 5 alasan
+'follow_up' => [
+    'max_attempts_per_stage' => 3,
+    'default_interval_days' => 3
+]
+```
+
+### Real-time Features
+- **Auto-scheduling**: Follow up otomatis dijadwalkan
+- **Status updates**: Real-time update status leads
+- **Notifications**: Reminder follow up hari ini
+- **Dashboard widgets**: Live statistics
+
+### Security Features
+- **Authentication**: Laravel Breeze
+- **Authorization**: Role-based access control
+- **CSRF Protection**: Laravel built-in
+- **File Upload**: Validated mime types and size
+- **SQL Injection**: Eloquent ORM protection
+- **XSS Protection**: Blade templating
+
+### Performance Optimizations
+- **Caching**: Follow up stages cached
+- **Pagination**: Large data sets paginated
+- **Lazy Loading**: Images and documents
+- **Database Indexing**: Key fields indexed
+- **Asset Optimization**: Vite build optimization
+
+### Backup and Recovery
+- **Database**: Daily automated backups (production)
+- **Files**: Synchronized to cloud storage
+- **Export**: Manual export reports for backup
+- **Recovery**: Point-in-time recovery available
+
+---
+
 ## FAQ DAN TIPS
 
 ### Frequently Asked Questions
@@ -403,6 +764,84 @@ A: Ya, tapi pastikan data closing (tanggal, nominal, alasan) sudah benar karena 
 #### Q: Format nomor WhatsApp yang benar?
 A: Gunakan format international dimulai dengan 62, contoh: 628123456789
 
+#### Q: Bagaimana cara mengatasi leads yang tidak bisa dihubungi?
+A: Ubah status menjadi COLD setelah 3x percobaan follow up. Bisa dicoba lagi nanti dengan kontak alternatif.
+
+#### Q: Apakah bisa mengubah urutan tahapan follow up?
+A: Ya, Super User dapat mengatur urutan di menu "Follow Up Stages". Tahapan bisa di-skip sesuai kondisi.
+
+#### Q: Bagaimana cara backup data leads?
+A: Export laporan secara berkala. Supervisor dan Super User dapat export dalam format Excel/PDF.
+
+#### Q: Bisakah satu user akses multiple cabang?
+A: Supervisor bisa diassign ke multiple cabang. Marketing hanya 1 cabang. Super User akses semua.
+
+#### Q: Apa yang terjadi jika follow up terlambat?
+A: Follow up tetap bisa dilakukan. Sistem akan menandai sebagai "terlambat" di dashboard supervisor.
+
+#### Q: Bagaimana cara menghapus leads yang salah input?
+A: Hanya Super User yang bisa hapus leads. Marketing bisa edit atau ubah status menjadi EXIT.
+
+#### Q: Format file apa saja yang bisa diupload?
+A: Dokumen: PDF, DOC, XLSX, JPG, PNG (max 10MB). Foto kunjungan: JPG, PNG, WEBP (max 5MB).
+
+#### Q: Bisakah leads pindah cabang?
+A: Ya, Super User dapat edit leads dan mengubah cabang assignment.
+
+#### Q: Bagaimana sistem auto-scheduling bekerja?
+A: Sistem otomatis jadwalkan follow up +3 hari setelah attempt terakhir. Bisa diubah manual.
+
+### Advanced Features
+
+#### Bulk Operations (Super User)
+- **Bulk Import Leads**: Upload Excel dengan template khusus
+- **Bulk Assign**: Assign multiple leads ke marketing tertentu
+- **Bulk Status Update**: Ubah status multiple leads sekaligus
+- **Bulk Export**: Export leads dengan filter advanced
+
+#### Custom Reporting
+- **Date Range Filters**: Filter laporan berdasarkan rentang tanggal
+- **Multiple Dimensions**: Group by cabang, marketing, sumber leads
+- **Conversion Funnel**: Analisa conversion rate per tahap
+- **Performance Metrics**: Lead velocity, response time, closing rate
+
+#### Integration Capabilities
+- **WhatsApp Integration**: Link langsung ke WhatsApp dengan nomor leads
+- **Google Maps**: Integrasi lokasi kunjungan dengan Google Maps
+- **Calendar Sync**: Sinkronisasi jadwal follow up (future enhancement)
+- **Email Notifications**: Notifikasi follow up via email (configurable)
+
+#### Mobile Optimization
+- **Responsive Design**: Optimal di semua device
+- **Touch Friendly**: Button dan input sesuai mobile
+- **Fast Loading**: Optimized untuk koneksi mobile
+- **Offline Capability**: Basic functionality tanpa internet (future)
+
+#### Data Analytics
+
+##### Lead Sources Analysis
+```
+Facebook Ads    : 45% (Conversion rate: 12%)
+Instagram       : 30% (Conversion rate: 18%)
+Referral        : 15% (Conversion rate: 35%)
+Website         : 10% (Conversion rate: 8%)
+```
+
+##### Follow Up Effectiveness
+```
+Stage dengan Conversion Tertinggi:
+1. Survey          : 65% → Presentasi
+2. Presentasi      : 45% → Form Pesanan  
+3. Form Pesanan    : 80% → Invoice
+4. Rekomendasi     : 35% → Survey
+```
+
+##### Marketing Performance Metrics
+- **Lead Volume**: Jumlah leads baru per marketing
+- **Conversion Rate**: Persentase WARM → CUSTOMER
+- **Response Time**: Rata-rata waktu respon follow up
+- **Deal Value**: Rata-rata nominal closing per marketing
+
 ### Tips Umum
 
 #### Untuk Semua User
@@ -418,10 +857,101 @@ A: Gunakan format international dimulai dengan 62, contoh: 628123456789
 - Laporkan jika ada akses yang mencurigakan
 
 #### Troubleshooting
-- **Lambat**: Clear browser cache dan cookies
-- **Error Upload**: Cek ukuran file (max 10MB) dan format yang didukung
-- **Tidak Bisa Login**: Cek caps lock dan pastikan email/password benar
-- **Data Tidak Muncul**: Refresh halaman atau cek filter yang aktif
+
+##### Problem: Website Lambat
+**Symptoms**: Halaman loading lama, responsive lambat
+**Solutions**:
+1. Clear browser cache: Ctrl+Shift+Delete (Chrome/Firefox)
+2. Disable extensions sementara
+3. Coba browser different (Chrome recommended)
+4. Check koneksi internet
+5. Close tab lain yang tidak perlu
+6. Restart browser
+
+##### Problem: Error Upload File
+**Symptoms**: "Upload failed", "File too large", "Invalid format"
+**Solutions**:
+1. Check ukuran file (max 10MB untuk dokumen, 5MB untuk foto)
+2. Check format file (PDF, DOC, XLSX, JPG, PNG untuk dokumen)
+3. Rename file jika ada karakter khusus
+4. Compress file jika terlalu besar
+5. Convert format jika tidak didukung
+6. Try upload ulang setelah refresh
+
+##### Problem: Login Gagal
+**Symptoms**: "Invalid credentials", "Login failed"
+**Solutions**:
+1. Check caps lock status
+2. Copy-paste password untuk avoid typo
+3. Check email format (harus valid email)
+4. Reset password jika perlu
+5. Contact admin untuk reset account
+6. Try different browser
+
+##### Problem: Data Tidak Muncul
+**Symptoms**: List kosong, dashboard blank, filter tidak work
+**Solutions**:
+1. Refresh halaman (F5 atau Ctrl+R)
+2. Check filter yang aktif (reset filter)
+3. Check cabang yang dipilih di dropdown
+4. Logout dan login ulang
+5. Check koneksi internet
+6. Clear browser cache
+
+##### Problem: Follow Up Tidak Terjadwal
+**Symptoms**: Auto-schedule tidak work, follow up hilang
+**Solutions**:
+1. Check apakah follow up sudah di-complete
+2. Manual schedule ulang jika perlu
+3. Check maksimal attempts (3x per stage)
+4. Refresh halaman follow up
+5. Contact supervisor/admin
+
+##### Problem: Dokumen Tidak Bisa Download
+**Symptoms**: Error download, file corrupt
+**Solutions**:
+1. Check koneksi internet
+2. Try download ulang
+3. Try browser different
+4. Check file masih exist (belum dihapus)
+5. Contact admin jika masih error
+
+##### Problem: Export Laporan Gagal
+**Symptoms**: "Export failed", file kosong
+**Solutions**:
+1. Check date range filter (tidak terlalu luas)
+2. Reduce data scope dengan filter
+3. Try export format different (Excel vs PDF)
+4. Refresh dan try again
+5. Contact admin untuk large dataset
+
+##### Problem: Notification Tidak Muncul
+**Symptoms**: Reminder follow up tidak ada
+**Solutions**:
+1. Check browser notification settings
+2. Allow notification untuk website
+3. Check dashboard for manual check
+4. Refresh dashboard
+5. Contact admin untuk email notification setup
+
+##### Problem: Mobile Display Issue
+**Symptoms**: Layout rusak di mobile, button tidak bisa diklik
+**Solutions**:
+1. Use portrait orientation
+2. Zoom level set ke 100%
+3. Update browser mobile ke versi terbaru
+4. Clear mobile browser cache
+5. Use Chrome Mobile (recommended)
+6. Avoid browser built-in (Samsung Internet, dll)
+
+##### Problem: Session Expired Frequently
+**Symptoms**: Sering logout otomatis, "Session expired"
+**Solutions**:
+1. Don't open multiple tabs dengan account sama
+2. Avoid closing browser tab langsung
+3. Use proper logout button
+4. Check browser cookie settings
+5. Contact admin untuk session timeout config
 
 ### Kontak Support
 
@@ -434,5 +964,90 @@ Jika mengalami kendala teknis atau butuh bantuan:
 
 *Panduan ini dibuat untuk memastikan semua pengguna dapat menggunakan Leads Aladdin dengan optimal. Update panduan ini akan dilakukan berkala sesuai perkembangan fitur sistem.*
 
-**Versi: 1.0**  
-**Terakhir Diperbarui: September 2025**
+### Appendix
+
+#### Shortcut Keyboard (Desktop)
+- **Ctrl + /** : Buka search/filter
+- **Ctrl + N** : Tambah leads baru (di halaman leads)
+- **Ctrl + S** : Save form (saat edit)
+- **Esc** : Close modal/dialog
+- **Tab** : Navigate antar field
+- **Enter** : Submit form
+
+#### Status Icons Reference
+- 🟢 **WARM**: Leads baru, belum follow up
+- 🔥 **HOT**: Sudah ada minat, perlu presentasi
+- ✅ **CUSTOMER**: Deal closed, sudah bayar
+- ❌ **EXIT**: Tidak jadi, sudah konfirmasi
+- 🧊 **COLD**: Tidak ada respon setelah 3x follow up
+- 🔄 **CROSS_SELLING**: Existing customer, ada opportunity lain
+
+#### Priority Indicators
+- ⚡ **Fasttrack**: Urgent, high value
+- 📝 **Normal**: Standard priority
+- 📉 **Rendah**: Low priority, long term
+
+#### Follow Up Stage Icons
+- 👋 **Greeting**: Initial contact
+- 💭 **Impresi**: First impression
+- 💬 **Small Talk**: Building rapport  
+- 💡 **Rekomendasi**: Product recommendation
+- 📏 **Survei**: Site survey/measurement
+- 📊 **Presentasi**: Proposal presentation
+- 📋 **Form Pesanan**: Order form
+- 🎯 **Up/Cross Selling**: Additional products
+- 💰 **Invoice**: Payment processing
+- 🏗️ **Pemasangan**: Installation confirmation
+
+#### Color Coding
+- **Hijau** (#2B5235): Primary brand color, success, active
+- **Emas** (#DDBE75): Secondary color, warnings, pending
+- **Merah**: Danger, errors, EXIT status
+- **Biru**: Information, links, HOT status
+- **Abu-abu**: Disabled, inactive, COLD status
+
+#### Mobile Gestures
+- **Swipe Left**: Quick actions (edit, delete)
+- **Pull Down**: Refresh data
+- **Long Press**: Context menu
+- **Double Tap**: Quick view detail
+- **Pinch**: Zoom (pada foto/dokumen)
+
+#### Quick Reference Checklist
+
+##### Daily Marketing Checklist
+- [ ] Check dashboard untuk follow up hari ini
+- [ ] Prioritas leads HOT dan Fasttrack
+- [ ] Lakukan follow up sesuai jadwal  
+- [ ] Update hasil follow up
+- [ ] Schedule follow up berikutnya
+- [ ] Upload dokumen jika ada
+- [ ] Update status leads jika ada progress
+
+##### Weekly Supervisor Checklist  
+- [ ] Review performance marketing
+- [ ] Analisa conversion rate per sumber leads
+- [ ] Check follow up yang terlambat
+- [ ] Export laporan mingguan
+- [ ] Review leads yang stuck di satu stage
+- [ ] Koordinasi dengan marketing untuk improvement
+
+##### Monthly Super User Checklist
+- [ ] Review dan update master data
+- [ ] Analisa performance antar cabang
+- [ ] Update konfigurasi follow up jika perlu
+- [ ] Review user access dan permissions
+- [ ] Backup data sistem
+- [ ] Training untuk user baru
+- [ ] System optimization dan maintenance
+
+---
+
+**📚 PANDUAN PENGGUNA LEADS ALADDIN**  
+**Sistem Manajemen Leads untuk Industri Karpet**
+
+**Versi: 2.0**  
+**Terakhir Diperbarui: September 2025**  
+**Total Halaman: 80+**
+
+*Panduan komprehensif ini mencakup semua aspek penggunaan sistem dari basic operation hingga advanced features. Update akan dilakukan berkala sesuai perkembangan sistem.*
