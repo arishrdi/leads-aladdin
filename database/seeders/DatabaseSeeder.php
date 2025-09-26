@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SumberLeadsSeeder::class,
             TipeKarpetSeeder::class,
             UserCabangSeeder::class,
+            FollowUpStageSeeder::class,
             // LeadsSeeder::class,
             // FollowUpSeeder::class,
             // DokumenSeeder::class,

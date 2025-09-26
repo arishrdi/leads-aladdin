@@ -13,18 +13,58 @@ class FollowUpStageSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get stages from config to migrate to database
-        $configStages = config('leads.follow_up_stages', []);
-        $stageProgression = config('leads.follow_up.auto_scheduling.stage_progression', []);
+        // Define default follow-up stages based on business requirements
+        $stages = [
+            'greeting' => [
+                'name' => 'Greeting',
+                'next_stage_key' => 'impresi',
+            ],
+            'impresi' => [
+                'name' => 'Impresi',
+                'next_stage_key' => 'small_talk',
+            ],
+            'small_talk' => [
+                'name' => 'Small Talk',
+                'next_stage_key' => 'rekomendasi',
+            ],
+            'rekomendasi' => [
+                'name' => 'Rekomendasi',
+                'next_stage_key' => 'pengajuan_survei',
+            ],
+            'pengajuan_survei' => [
+                'name' => 'Pengajuan Survei',
+                'next_stage_key' => 'presentasi',
+            ],
+            'presentasi' => [
+                'name' => 'Presentasi',
+                'next_stage_key' => 'form_pemesanan',
+            ],
+            'form_pemesanan' => [
+                'name' => 'Form Pemesanan',
+                'next_stage_key' => 'up_cross_selling',
+            ],
+            'up_cross_selling' => [
+                'name' => 'Up / Cross Selling',
+                'next_stage_key' => 'invoice',
+            ],
+            'invoice' => [
+                'name' => 'Invoice (Pembayaran)',
+                'next_stage_key' => 'konfirmasi_pemasangan',
+            ],
+            'konfirmasi_pemasangan' => [
+                'name' => 'Konfirmasi Pemasangan',
+                'next_stage_key' => null,
+            ],
+        ];
         
         $order = 1;
-        foreach ($configStages as $key => $name) {
+        foreach ($stages as $key => $stageData) {
             FollowUpStage::updateOrCreate(
                 ['key' => $key],
                 [
-                    'name' => $name,
+                    'name' => $stageData['name'],
                     'display_order' => $order,
-                    'next_stage_key' => $stageProgression[$key] ?? null,
+                    'next_stage_key' => $stageData['next_stage_key'],
                     'is_active' => true,
                 ]
             );

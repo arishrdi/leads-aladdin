@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Leads;
 use App\Models\FollowUp;
 use App\Models\Cabang;
+use App\Models\Kunjungan;
 use App\Services\LeadManagementService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -38,12 +39,30 @@ class DashboardController extends Controller
             $leadsQuery->whereIn('cabang_id', $cabangIds);
         }
         
+        // Get kunjungan based on user role and active branch
+        $kunjunganQuery = Kunjungan::where('is_active', true);
+        
+        // Apply active branch filtering first (if set)
+        if ($activeBranch) {
+            $kunjunganQuery->where('cabang_id', $activeBranch->id);
+        }
+        // Apply role-based filtering if no active branch is set
+        elseif ($user->isMarketing()) {
+            $kunjunganQuery->where('user_id', $user->id);
+        } elseif ($user->isSupervisor()) {
+            $cabangIds = $user->cabangs()->pluck('user_cabangs.cabang_id');
+            $kunjunganQuery->whereIn('cabang_id', $cabangIds);
+        }
+
         // Calculate statistics
         $stats = [
             'total_leads' => $leadsQuery->count(),
             'warm_leads' => (clone $leadsQuery)->where('status', 'WARM')->count(),
             'hot_leads' => (clone $leadsQuery)->where('status', 'HOT')->count(),
             'customers' => (clone $leadsQuery)->where('status', 'CUSTOMER')->count(),
+            'total_kunjungan' => $kunjunganQuery->count(),
+            'active_kunjungan' => (clone $kunjunganQuery)->whereIn('status', ['WARM', 'HOT'])->count(),
+            'completed_kunjungan' => (clone $kunjunganQuery)->where('status', 'HOT')->count(),
         ];
 
         // Add follow-up stats based on role and active branch
@@ -79,6 +98,22 @@ class DashboardController extends Controller
                     'nama_pelanggan' => $lead->nama_pelanggan,
                     'status' => $lead->status,
                     'tanggal_leads' => $lead->tanggal_leads->format('d M Y'),
+                ];
+            });
+
+        // Get recent kunjungan
+        $recentKunjungan = (clone $kunjunganQuery)
+            ->with(['user', 'cabang'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($kunjungan) {
+                return [
+                    'id' => $kunjungan->id,
+                    'nama_masjid' => $kunjungan->nama_masjid,
+                    'status' => $kunjungan->status,
+                    'waktu_canvasing' => $kunjungan->waktu_canvasing->format('d M Y'),
+                    'bertemu_dengan' => $kunjungan->bertemu_dengan,
                 ];
             });
 
@@ -162,6 +197,17 @@ class DashboardController extends Controller
                     ->where('status', 'scheduled')
                     ->count();
 
+                // Kunjungan stats for this branch
+                $cabangKunjungan = Kunjungan::where('cabang_id', $cabang->id)->where('is_active', true);
+                $totalKunjungan = $cabangKunjungan->count();
+                $activeKunjungan = (clone $cabangKunjungan)->whereIn('status', ['WARM', 'HOT'])->count();
+                $completedKunjungan = (clone $cabangKunjungan)->where('status', 'HOT')->count();
+                
+                $thisMonthKunjungan = (clone $cabangKunjungan)
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->count();
+
                 // Recent leads for this branch
                 $recentLeads = (clone $cabangLeads)
                     ->orderBy('created_at', 'desc')
@@ -196,6 +242,10 @@ class DashboardController extends Controller
                         'this_month_customers' => $thisMonthCustomers,
                         'todays_followups' => $todaysFollowups,
                         'overdue_followups' => $overdueFollowups,
+                        'total_kunjungan' => $totalKunjungan,
+                        'active_kunjungan' => $activeKunjungan,
+                        'completed_kunjungan' => $completedKunjungan,
+                        'this_month_kunjungan' => $thisMonthKunjungan,
                     ],
                     'recent_leads' => $recentLeads
                 ];
@@ -260,6 +310,7 @@ class DashboardController extends Controller
         return Inertia::render('dashboard', [
             'stats' => $stats,
             'recent_leads' => $recentLeads,
+            'recent_kunjungan' => $recentKunjungan,
             'todays_followups' => $todaysFollowups,
             'outlet_comparison' => $outletComparison,
             'all_branches' => $allBranches,
