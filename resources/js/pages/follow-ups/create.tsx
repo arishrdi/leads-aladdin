@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
@@ -60,12 +60,16 @@ export default function CreateFollowUp() {
         return phone;
     };
 
-    // Set default date to tomorrow at 9 AM
+    // Set default date to tomorrow at 9 AM (Jakarta time)
     const getDefaultDateTime = () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(9, 0, 0, 0);
-        return tomorrow.toISOString().slice(0, 16);
+        // Convert to Jakarta timezone-aware string
+        const jakartaOffset = 7 * 60; // Jakarta is UTC+7
+        const utc = tomorrow.getTime() + (tomorrow.getTimezoneOffset() * 60000);
+        const jakartaTime = new Date(utc + (jakartaOffset * 60000));
+        return jakartaTime.toISOString().slice(0, 16);
     };
 
     // Initialize default scheduled time if not set
@@ -187,13 +191,11 @@ export default function CreateFollowUp() {
 
                                 <div>
                                     <Label htmlFor="scheduled_at">Jadwal Follow-up *</Label>
-                                    <Input
-                                        id="scheduled_at"
-                                        type="datetime-local"
+                                    <DateTimePicker
                                         value={data.scheduled_at}
-                                        onChange={(e) => setData('scheduled_at', e.target.value)}
-                                        min={new Date().toISOString().slice(0, 16)}
-                                        className={errors.scheduled_at ? 'border-red-500' : ''}
+                                        onValueChange={(value) => setData('scheduled_at', value || '')}
+                                        placeholder="Pilih tanggal dan waktu follow-up"
+                                        hasError={!!errors.scheduled_at}
                                     />
                                     <p className="text-xs text-gray-500 mt-1">
                                         Pilih tanggal dan waktu yang tepat untuk menghubungi pelanggan

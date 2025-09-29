@@ -213,11 +213,15 @@ class FollowUpController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
+        // Convert the datetime to UTC for storage (assuming input is in Asia/Jakarta timezone)
+        $scheduledAt = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['scheduled_at'], 'Asia/Jakarta');
+        $scheduledAtUtc = $scheduledAt->utc();
+
         $this->leadService->createFollowUp(
             $lead,
             $validated['stage'],
             1,
-            \Carbon\Carbon::parse($validated['scheduled_at'])
+            $scheduledAtUtc
         );
 
         return redirect()->route('follow-ups.index')

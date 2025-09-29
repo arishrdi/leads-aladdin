@@ -155,21 +155,21 @@ export default function ShowLead() {
             
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
                         <Button variant="outline" size="sm" onClick={() => window.history.back()}>
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
-                        <div>
-                            <h1 className="text-2xl font-bold text-brand-primary">
+                        <div className="min-w-0 flex-1">
+                            <h1 className="text-xl sm:text-2xl font-bold text-brand-primary break-words">
                                 {lead.sapaan} {lead.nama_pelanggan}
                             </h1>
                             {lead.nama_masjid_instansi && (
-                                <p className="text-gray-600">{lead.nama_masjid_instansi}</p>
+                                <p className="text-gray-600 text-sm sm:text-base break-words">{lead.nama_masjid_instansi}</p>
                             )}
                         </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-start sm:justify-end">
                         <Badge className={statusColors[lead.status as keyof typeof statusColors]}>
                             {lead.status}
                         </Badge>
@@ -180,7 +180,7 @@ export default function ShowLead() {
                             <Link href={`/leads/${lead.id}/edit`}>
                                 <Button size="sm">
                                     <Edit className="h-4 w-4 mr-2" />
-                                    Edit
+                                    <span className="hidden sm:inline">Edit</span>
                                 </Button>
                             </Link>
                         )}
@@ -342,13 +342,13 @@ export default function ShowLead() {
                                     <div className="space-y-4">
                                         {lead.follow_ups.map((followUp, index) => (
                                             <div key={followUp.id}>
-                                                <div className="flex items-start justify-between">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <span className="font-medium">{followUp.stage}</span>
+                                                <div className="flex flex-col sm:flex-row items-start gap-3">
+                                                    <div className="flex-1 w-full min-w-0">
+                                                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                            <span className="font-medium text-sm sm:text-base">{followUp.stage}</span>
                                                             <Badge 
                                                                 variant="outline" 
-                                                                className={followUpStatusColors[followUp.status as keyof typeof followUpStatusColors]}
+                                                                className={`text-xs ${followUpStatusColors[followUp.status as keyof typeof followUpStatusColors]}`}
                                                             >
                                                                 {followUpStatusLabels[followUp.status as keyof typeof followUpStatusLabels]}
                                                             </Badge>
@@ -356,27 +356,43 @@ export default function ShowLead() {
                                                                 Percobaan #{followUp.attempt}
                                                             </span>
                                                         </div>
-                                                        <p className="text-sm text-gray-600">
-                                                            Dijadwalkan: {new Date(followUp.scheduled_at).toLocaleString('id-ID')}
-                                                        </p>
-                                                        {followUp.completed_at && (
-                                                            <p className="text-sm text-gray-600">
-                                                                Diselesaikan: {new Date(followUp.completed_at).toLocaleString('id-ID')}
+                                                        <div className="space-y-1">
+                                                            <p className="text-xs sm:text-sm text-gray-600">
+                                                                Dijadwalkan: {new Date(followUp.scheduled_at).toLocaleDateString('id-ID', {
+                                                                    day: '2-digit',
+                                                                    month: 'short',
+                                                                    year: 'numeric',
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit'
+                                                                })}
                                                             </p>
-                                                        )}
-                                                        {followUp.catatan && (
-                                                            <p className="text-sm text-gray-700 mt-1">{followUp.catatan}</p>
-                                                        )}
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            oleh {followUp.user.name}
-                                                        </p>
+                                                            {followUp.completed_at && (
+                                                                <p className="text-xs sm:text-sm text-gray-600">
+                                                                    Diselesaikan: {new Date(followUp.completed_at).toLocaleDateString('id-ID', {
+                                                                        day: '2-digit',
+                                                                        month: 'short',
+                                                                        year: 'numeric',
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </p>
+                                                            )}
+                                                            {followUp.catatan && (
+                                                                <p className="text-xs sm:text-sm text-gray-700 break-words">{followUp.catatan}</p>
+                                                            )}
+                                                            <p className="text-xs text-gray-500">
+                                                                oleh {followUp.user.name}
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                     {followUp.status === 'scheduled' && canCreateFollowUp && (
-                                                        <Link href={`/follow-ups/${followUp.id}`}>
-                                                            <Button size="sm" variant="outline">
-                                                                Lihat
-                                                            </Button>
-                                                        </Link>
+                                                        <div className="w-full sm:w-auto">
+                                                            <Link href={`/follow-ups/${followUp.id}`}>
+                                                                <Button size="sm" variant="outline" className="w-full sm:w-auto">
+                                                                    Lihat
+                                                                </Button>
+                                                            </Link>
+                                                        </div>
                                                     )}
                                                 </div>
                                                 {index < lead.follow_ups.length - 1 && (
@@ -423,23 +439,29 @@ export default function ShowLead() {
                                 {lead.dokumens.length > 0 ? (
                                     <div className="space-y-3">
                                         {lead.dokumens.map((dokumen) => (
-                                            <div key={dokumen.id} className="flex items-center justify-between p-3 border rounded-lg">
-                                                <div className="flex-1">
-                                                    <h4 className="font-medium">{dokumen.judul}</h4>
-                                                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                                                        <span>{dokumen.kategori}</span>
+                                            <div key={dokumen.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 border rounded-lg">
+                                                <div className="flex-1 w-full min-w-0">
+                                                    <h4 className="font-medium text-sm sm:text-base break-words">{dokumen.judul}</h4>
+                                                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mt-1">
+                                                        <span className="bg-gray-100 px-2 py-1 rounded text-xs">{dokumen.kategori}</span>
                                                         <span>{formatFileSize(dokumen.file_size)}</span>
-                                                        <span>{new Date(dokumen.created_at).toLocaleDateString('id-ID')}</span>
+                                                        <span>{new Date(dokumen.created_at).toLocaleDateString('id-ID', {
+                                                            day: '2-digit',
+                                                            month: 'short',
+                                                            year: 'numeric'
+                                                        })}</span>
                                                     </div>
                                                     <p className="text-xs text-gray-500 mt-1">
                                                         oleh {dokumen.user.name}
                                                     </p>
                                                 </div>
-                                                <a href={`/dokumens/${dokumen.id}/download`} download>
-                                                    <Button size="sm" variant="outline">
-                                                        Download
-                                                    </Button>
-                                                </a>
+                                                <div className="w-full sm:w-auto">
+                                                    <a href={`/dokumens/${dokumen.id}/download`} download>
+                                                        <Button size="sm" variant="outline" className="w-full sm:w-auto">
+                                                            Download
+                                                        </Button>
+                                                    </a>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>

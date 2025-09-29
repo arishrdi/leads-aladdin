@@ -161,7 +161,7 @@ export default function ShowFollowUp() {
                         </Badge>
                         {followUp.auto_scheduled && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                                Auto-scheduled
+                                Jadwal Otomatis
                             </Badge>
                         )}
                     </div>
